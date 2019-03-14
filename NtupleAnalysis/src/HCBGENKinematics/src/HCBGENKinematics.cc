@@ -122,263 +122,6 @@ private:
   
   Tools auxTools;
   
-  // Event Counters
-  Count cAllEvents;  
-  Count cTrigger;
-  Count cElectronVeto;
-  Count cMuonVeto;
-  Count cTauVeto;
-  Count cJetSelection;
-  Count cBJetSelection;
-  // Count cTopologySelection;
-  Count cTopSelection;
-  Count cSelected;
-  // BR Counters
-  Count cInclusive;
-  Count cHtb_HPlus;
-  Count cHtb_TQuark;
-  Count cHtb_BQuark;
-  Count cHtb_tbW_BQuark;
-  Count cHtb_tbW_WBoson;
-  Count cHtb_tbW_Wqq_Quark;
-  Count cHtb_tbW_Wqq_AntiQuark;
-  Count cHtb_tbW_Wqq_Leptons;
-  Count cgtt_TQuark;
-  Count cgbb_BQuark;
-  Count cgtt_tbW_Wqq_Quark;
-  Count cgtt_tbW_Wqq_AntiQuark;
-  Count cgtt_tbW_Wqq_Leptons;
-  Count cgtt_tbW_WBoson;
-  Count cgtt_tbW_BQuark;
-
-  // Event Variables
-  WrappedTH1 *h_genMET_Et;
-  WrappedTH1 *h_genMET_Phi;
-  WrappedTH1 *h_genHT_GenParticles;
-  WrappedTH1 *h_genHT_GenJets;  
-  
-  // GenParticles
-  WrappedTH1 *h_gtt_TQuark_Pt;
-  WrappedTH1 *h_gtt_tbW_WBoson_Pt;
-  WrappedTH1 *h_gtt_tbW_BQuark_Pt;
-  WrappedTH1 *h_gtt_tbW_Wqq_Quark_Pt;
-  WrappedTH1 *h_gtt_tbW_Wqq_AntiQuark_Pt;
-  WrappedTH1 *h_tbH_HPlus_Pt;
-  WrappedTH1 *h_tbH_TQuark_Pt;
-  WrappedTH1 *h_tbH_BQuark_Pt;
-  WrappedTH1 *h_tbH_tbW_WBoson_Pt;
-  WrappedTH1 *h_tbH_tbW_BQuark_Pt;
-  WrappedTH1 *h_gbb_BQuark_Pt;
-  WrappedTH1 *h_Htb_tbW_Wqq_Quark_Pt;
-  WrappedTH1 *h_Htb_tbW_Wqq_AntiQuark_Pt;
-  //
-  WrappedTH1 *h_gtt_TQuark_Eta;
-  WrappedTH1 *h_gtt_tbW_WBoson_Eta;
-  WrappedTH1 *h_gtt_tbW_BQuark_Eta;
-  WrappedTH1 *h_gtt_tbW_Wqq_Quark_Eta;
-  WrappedTH1 *h_gtt_tbW_Wqq_AntiQuark_Eta;  
-  WrappedTH1 *h_tbH_HPlus_Eta;
-  WrappedTH1 *h_tbH_TQuark_Eta;
-  WrappedTH1 *h_tbH_BQuark_Eta;
-  WrappedTH1 *h_tbH_tbW_WBoson_Eta;
-  WrappedTH1 *h_tbH_tbW_BQuark_Eta;
-  WrappedTH1 *h_gbb_BQuark_Eta;
-  WrappedTH1 *h_Htb_tbW_Wqq_Quark_Eta;
-  WrappedTH1 *h_Htb_tbW_Wqq_AntiQuark_Eta;
-  //
-  WrappedTH1 *h_gtt_TQuark_Rap;
-  WrappedTH1 *h_gtt_tbW_WBoson_Rap;
-  WrappedTH1 *h_gtt_tbW_BQuark_Rap;
-  WrappedTH1 *h_gtt_tbW_Wqq_Quark_Rap;
-  WrappedTH1 *h_gtt_tbW_Wqq_AntiQuark_Rap;  
-  WrappedTH1 *h_tbH_HPlus_Rap;
-  WrappedTH1 *h_tbH_TQuark_Rap;
-  WrappedTH1 *h_tbH_BQuark_Rap;
-  WrappedTH1 *h_tbH_tbW_WBoson_Rap;
-  WrappedTH1 *h_tbH_tbW_BQuark_Rap;
-  WrappedTH1 *h_gbb_BQuark_Rap;
-  WrappedTH1 *h_Htb_tbW_Wqq_Quark_Rap;
-  WrappedTH1 *h_Htb_tbW_Wqq_AntiQuark_Rap;
-  //  
-  WrappedTH1 *h_Htb_TQuark_Htb_BQuark_dR;
-  WrappedTH1 *h_Htb_TQuark_gtt_TQuark_dR;
-  WrappedTH1 *h_Htb_TQuark_gbb_BQuark_dR;
-  //
-  WrappedTH1 *h_Htb_TQuark_Htb_BQuark_dEta;
-  WrappedTH1 *h_Htb_TQuark_gtt_TQuark_dEta;
-  WrappedTH1 *h_Htb_TQuark_gbb_BQuark_dEta;
-  //
-  WrappedTH1 *h_Htb_TQuark_Htb_BQuark_dPhi;
-  WrappedTH1 *h_Htb_TQuark_gtt_TQuark_dPhi;
-  WrappedTH1 *h_Htb_TQuark_gbb_BQuark_dPhi;
-  //  
-  WrappedTH1 *h_Htb_TQuark_Htb_BQuark_dRap;
-  WrappedTH1 *h_Htb_TQuark_gtt_TQuark_dRap;
-  WrappedTH1 *h_Htb_TQuark_gbb_BQuark_dRap;
-  //  
-  WrappedTH1 *h_Htb_BQuark_Htb_tbW_BQuark_dR;
-  WrappedTH1 *h_Htb_BQuark_Htb_tbW_Wqq_Quark_dR;
-  WrappedTH1 *h_Htb_BQuark_Htb_tbW_Wqq_AntiQuark_dR;
-  WrappedTH1 *h_Htb_tbW_BQuark_Htb_tbW_Wqq_Quark_dR;
-  WrappedTH1 *h_Htb_tbW_BQuark_Htb_tbW_Wqq_AntiQuark_dR;
-  //
-  WrappedTH1 *h_Htb_tbW_WBoson_Quark_Htb_tbW_WBoson_AntiQuark_dR;
-  WrappedTH1 *h_Htb_tbW_WBoson_Htb_BQuark_dR;
-  WrappedTH1 *h_Htb_tbW_WBoson_Htb_tbW_BQuark_dR;
-  WrappedTH1 *h_Htb_tbW_WBoson_gtt_tbW_BQuark_dR;
-  WrappedTH1 *h_Htb_tbW_WBoson_gbb_BQuark_dR;
-  WrappedTH1 *h_gtt_tbW_WBoson_Htb_BQuark_dR;
-  WrappedTH1 *h_gtt_tbW_WBoson_Htb_tbW_BQuark_dR;
-  WrappedTH1 *h_gtt_tbW_WBoson_gtt_tbW_BQuark_dR;
-  WrappedTH1 *h_gtt_tbW_WBoson_gbb_BQuark_dR;
-  //
-  WrappedTH1 *h_Htb_tbW_WBoson_Quark_Htb_tbW_WBoson_AntiQuark_dEta;
-  WrappedTH1 *h_Htb_tbW_WBoson_Htb_BQuark_dEta;
-  WrappedTH1 *h_Htb_tbW_WBoson_Htb_tbW_BQuark_dEta;
-  WrappedTH1 *h_Htb_tbW_WBoson_gtt_tbW_BQuark_dEta;
-  WrappedTH1 *h_Htb_tbW_WBoson_gbb_BQuark_dEta;
-  WrappedTH1 *h_gtt_tbW_WBoson_Htb_BQuark_dEta;
-  WrappedTH1 *h_gtt_tbW_WBoson_Htb_tbW_BQuark_dEta;
-  WrappedTH1 *h_gtt_tbW_WBoson_gtt_tbW_BQuark_dEta;
-  WrappedTH1 *h_gtt_tbW_WBoson_gbb_BQuark_dEta;
-  //
-  WrappedTH1 *h_Htb_tbW_WBoson_Quark_Htb_tbW_WBoson_AntiQuark_dPhi;
-  WrappedTH1 *h_Htb_tbW_WBoson_Htb_BQuark_dPhi;
-  WrappedTH1 *h_Htb_tbW_WBoson_Htb_tbW_BQuark_dPhi;
-  WrappedTH1 *h_Htb_tbW_WBoson_gtt_tbW_BQuark_dPhi;
-  WrappedTH1 *h_Htb_tbW_WBoson_gbb_BQuark_dPhi;
-  WrappedTH1 *h_gtt_tbW_WBoson_Htb_BQuark_dPhi;
-  WrappedTH1 *h_gtt_tbW_WBoson_Htb_tbW_BQuark_dPhi;
-  WrappedTH1 *h_gtt_tbW_WBoson_gtt_tbW_BQuark_dPhi;
-  WrappedTH1 *h_gtt_tbW_WBoson_gbb_BQuark_dPhi;
-  //
-  WrappedTH1 *h_gtt_TQuark_gbb_BQuark_dR;
-  WrappedTH1 *h_gtt_TQuark_gtt_tbW_BQuark_dR;
-  WrappedTH1 *h_gtt_tbW_BQuark_gtt_tbW_Wqq_Quark_dR;
-  WrappedTH1 *h_gtt_tbW_BQuark_gtt_tbW_Wqq_AntiQuark_dR;
-  //
-  WrappedTH1 *h_Htb_BQuark_Htb_tbW_BQuark_dEta;
-  WrappedTH1 *h_Htb_BQuark_Htb_tbW_Wqq_Quark_dEta;
-  WrappedTH1 *h_Htb_BQuark_Htb_tbW_Wqq_AntiQuark_dEta;
-  WrappedTH1 *h_Htb_tbW_BQuark_Htb_tbW_Wqq_Quark_dEta;
-  WrappedTH1 *h_Htb_tbW_BQuark_Htb_tbW_Wqq_AntiQuark_dEta;
-  WrappedTH1 *h_gtt_TQuark_gbb_BQuark_dEta;
-  WrappedTH1 *h_gtt_TQuark_gtt_tbW_BQuark_dEta;
-  WrappedTH1 *h_gtt_tbW_BQuark_gtt_tbW_Wqq_Quark_dEta;
-  WrappedTH1 *h_gtt_tbW_BQuark_gtt_tbW_Wqq_AntiQuark_dEta;
-  //
-  WrappedTH1 *h_Htb_BQuark_Htb_tbW_BQuark_dPhi;
-  WrappedTH1 *h_Htb_BQuark_Htb_tbW_Wqq_Quark_dPhi;
-  WrappedTH1 *h_Htb_BQuark_Htb_tbW_Wqq_AntiQuark_dPhi;
-  WrappedTH1 *h_Htb_tbW_BQuark_Htb_tbW_Wqq_Quark_dPhi;
-  WrappedTH1 *h_Htb_tbW_BQuark_Htb_tbW_Wqq_AntiQuark_dPhi;
-  WrappedTH1 *h_gtt_TQuark_gbb_BQuark_dPhi;
-  WrappedTH1 *h_gtt_TQuark_gtt_tbW_BQuark_dPhi;
-  WrappedTH1 *h_gtt_tbW_BQuark_gtt_tbW_Wqq_Quark_dPhi;
-  WrappedTH1 *h_gtt_tbW_BQuark_gtt_tbW_Wqq_AntiQuark_dPhi;
-  //  
-  WrappedTH1 *h_Htb_BQuark_Htb_tbW_BQuark_dRap;
-  WrappedTH1 *h_Htb_BQuark_Htb_tbW_Wqq_Quark_dRap;
-  WrappedTH1 *h_Htb_BQuark_Htb_tbW_Wqq_AntiQuark_dRap;
-  WrappedTH1 *h_Htb_tbW_BQuark_Htb_tbW_Wqq_Quark_dRap;
-  WrappedTH1 *h_Htb_tbW_BQuark_Htb_tbW_Wqq_AntiQuark_dRap;
-  WrappedTH1 *h_gtt_TQuark_gbb_BQuark_dRap;
-  WrappedTH1 *h_gtt_TQuark_gtt_tbW_BQuark_dRap;
-  WrappedTH1 *h_gtt_tbW_BQuark_gtt_tbW_Wqq_Quark_dRap;
-  WrappedTH1 *h_gtt_tbW_BQuark_gtt_tbW_Wqq_AntiQuark_dRap;
-
-  // GenParticles: BQuarks
-  WrappedTH1 *h_BQuark1_Pt;
-  WrappedTH1 *h_BQuark2_Pt;
-  WrappedTH1 *h_BQuark3_Pt;
-  WrappedTH1 *h_BQuark4_Pt;
-  //
-  WrappedTH1 *h_BQuark1_Eta;
-  WrappedTH1 *h_BQuark2_Eta;
-  WrappedTH1 *h_BQuark3_Eta;
-  WrappedTH1 *h_BQuark4_Eta;
-  // GenParticles: BQuarks pair closest together
-  WrappedTH1 *h_BQuarkPair_dRMin_pT;
-  WrappedTH1 *h_BQuarkPair_dRMin_dEta;
-  WrappedTH1 *h_BQuarkPair_dRMin_dPhi;
-  WrappedTH1 *h_BQuarkPair_dRMin_dR;
-  WrappedTH1 *h_BQuarkPair_dRMin_Mass;
-  WrappedTH2 *h_BQuarkPair_dRMin_Eta1_Vs_Eta2;
-  WrappedTH2 *h_BQuarkPair_dRMin_Phi1_Vs_Phi2;
-  WrappedTH2 *h_BQuarkPair_dRMin_Pt1_Vs_Pt2;
-  WrappedTH2 *h_BQuarkPair_dRMin_dEta_Vs_dPhi;
-  WrappedTH1 *h_BQuarkPair_dRMin_jet1_dR;
-  WrappedTH1 *h_BQuarkPair_dRMin_jet1_dEta;
-  WrappedTH1 *h_BQuarkPair_dRMin_jet1_dPhi;
-  WrappedTH1 *h_BQuarkPair_dRMin_jet2_dR;
-  WrappedTH1 *h_BQuarkPair_dRMin_jet2_dEta;
-  WrappedTH1 *h_BQuarkPair_dRMin_jet2_dPhi;
-
-  // GenParticles: bqq trijet system (H+)
-  WrappedTH1 *h_Htb_tbW_bqq_Pt;
-  WrappedTH1 *h_Htb_tbW_bqq_Rap;
-  WrappedTH1 *h_Htb_tbW_bqq_Mass;
-  WrappedTH1 *h_Htb_tbW_bqq_dRMax_dR;
-  WrappedTH1 *h_Htb_tbW_bqq_dRMax_dRap;
-  WrappedTH1 *h_Htb_tbW_bqq_dRMax_dPhi;
-  WrappedTH2 *h_Htb_tbW_bqq_dRMax_dRap_Vs_dPhi;
-
-  // GenParticles: bqq trijet system (associated top)
-  WrappedTH1 *h_gtt_tbW_bqq_Pt;
-  WrappedTH1 *h_gtt_tbW_bqq_Rap;
-  WrappedTH1 *h_gtt_tbW_bqq_Mass;
-  WrappedTH1 *h_gtt_tbW_bqq_dRMax_dR;
-  WrappedTH1 *h_gtt_tbW_bqq_dRMax_dRap;
-  WrappedTH1 *h_gtt_tbW_bqq_dRMax_dPhi;
-  WrappedTH2 *h_gtt_tbW_bqq_dRMax_dRap_Vs_dPhi;
-
-  // GenJets
-  WrappedTH1 *h_GenJets_N;  
-  WrappedTH1 *h_GenJet1_Pt;
-  WrappedTH1 *h_GenJet2_Pt;
-  WrappedTH1 *h_GenJet3_Pt;
-  WrappedTH1 *h_GenJet4_Pt;
-  WrappedTH1 *h_GenJet5_Pt;
-  WrappedTH1 *h_GenJet6_Pt;
-  //
-  WrappedTH1 *h_GenJet1_Eta;
-  WrappedTH1 *h_GenJet2_Eta;
-  WrappedTH1 *h_GenJet3_Eta;
-  WrappedTH1 *h_GenJet4_Eta;
-  WrappedTH1 *h_GenJet5_Eta;
-  WrappedTH1 *h_GenJet6_Eta;
-
-  // tt system
-  WrappedTH1 *h_tt_Pt;
-  WrappedTH1 *h_tt_Eta;
-  WrappedTH1 *h_tt_Rap; 
-  WrappedTH1 *h_tt_Mass;
-
-  // GenJets: Dijet with largest mass
-  WrappedTH1 *h_MaxDiJetMass_Pt;
-  WrappedTH1 *h_MaxDiJetMass_Eta;
-  WrappedTH1 *h_MaxDiJetMass_Rap; 
-  WrappedTH1 *h_MaxDiJetMass_Mass;
-  WrappedTH1 *h_MaxDiJetMass_dR;
-  WrappedTH1 *h_MaxDiJetMass_dRrap;
-  WrappedTH1 *h_MaxDiJetMass_dEta;
-  WrappedTH1 *h_MaxDiJetMass_dPhi;
-  WrappedTH1 *h_MaxDiJetMass_dRap;
-  WrappedTH2 *h_MaxDiJetMass_dEta_Vs_dPhi;
-  WrappedTH2 *h_MaxDiJetMass_dRap_Vs_dPhi;  
-
-  // Correlations 
-  WrappedTH2 *h_BQuark1_BQuark2_dEta_Vs_dPhi;
-  WrappedTH2 *h_BQuark1_BQuark3_dEta_Vs_dPhi;
-  WrappedTH2 *h_BQuark1_BQuark4_dEta_Vs_dPhi;
-  WrappedTH2 *h_BQuark2_BQuark3_dEta_Vs_dPhi;
-  WrappedTH2 *h_BQuark2_BQuark4_dEta_Vs_dPhi;
-  WrappedTH2 *h_BQuark3_BQuark4_dEta_Vs_dPhi;
-
-  WrappedTH2 *h_Jet1Jet2_dEta_Vs_Jet3Jet4_dEta;
-  WrappedTH2 *h_Jet1Jet2_dPhi_Vs_Jet3Jet4_dPhi;  
-  WrappedTH2 *h_Jet1Jet2_dEta_Vs_Jet1Jet2_Mass;
-  WrappedTH2 *h_Jet3Jet4_dEta_Vs_Jet3Jet4_Mass;
 
 };
 
@@ -921,7 +664,10 @@ void HtbKinematics::process(Long64_t entry) {
   // All Selections
   //================================================================================================
   cSelected.increment();
+  
 
+  /*
+  // delete
   // Fill Histograms
   h_GenJets_N->Fill(selectedJets.size());
 
@@ -2501,8 +2247,8 @@ double HtbKinematics::GetAlphaT(std::vector<math::XYZTLorentzVector> jets,
       /// i.e.: fDelta_sum_et += vEt[l] * ( 1 - 2*0 );  if comparison is un-successful
       ///  or   fDelta_sum_et += vEt[l] * ( 1 - 2*1 );  if comparison is successful
       // in this way you add up all Et from PseudoJetsGroupA (belonging to 0's group) and subtract that from PseudoJetsGroupB (1's group)
-      fDelta_sum_et += vEt[l] * ( 1 - 2 * (int(k>>l)&1) ); 
-      if ( bList ) { jet.push_back( (int(k>>l)&1) == 0 ); } 
+      fDelta_sum_et += vEt[l] * ( 1 - 2 * (int(k>>l)&1) );  
+      if ( bList ) { jet.push_back( (int(k>>l)&1) == 0 ); }  
     }
 
     // Find configuration with minimum value of DeltaHt 
@@ -2555,7 +2301,7 @@ double HtbKinematics::GetAlphaT(std::vector<math::XYZTLorentzVector> jets,
 
   return AlphaT;
 }
-
+*/
 vector<GenJet> HtbKinematics::GetGenJets(const vector<GenJet> genJets, std::vector<float> ptCuts, std::vector<float> etaCuts, vector<genParticle> genParticlesToMatch)
 {
   /*
