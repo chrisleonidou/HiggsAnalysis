@@ -1,30 +1,30 @@
-// // // -*- c++ -*-
-// // #include "Framework/interface/BaseSelector.h"
-// // #include "Framework/interface/makeTH.h"
+// -*- c++ -*-
+#include "Framework/interface/BaseSelector.h"
+#include "Framework/interface/makeTH.h"
 
-// // // User
-// // #include "Auxiliary/interface/Table.h"
-// // #include "Auxiliary/interface/Tools.h"
-// // #include "Tools/interface/MCTools.h"
-// // #include "Tools/interface/DirectionalCut.h"
-// // #include "EventSelection/interface/CommonPlots.h"
-// // #include "EventSelection/interface/EventSelections.h"
+// User
+#include "Auxiliary/interface/Table.h"
+#include "Auxiliary/interface/Tools.h"
+#include "Tools/interface/MCTools.h"
+#include "Tools/interface/DirectionalCut.h"
+#include "EventSelection/interface/CommonPlots.h"
+#include "EventSelection/interface/EventSelections.h"
 
-// // // ROOT
-// // #include "TDirectory.h"
-// // #include "Math/VectorUtil.h"
-// // #include "TMatrixDSym.h"
-// // #include "TMatrixDSymEigen.h"
+// ROOT
+#include "TDirectory.h"
+#include "Math/VectorUtil.h"
+#include "TMatrixDSym.h"
+#include "TMatrixDSymEigen.h"
 
-// // struct PtComparator
-// // {
-// //   bool operator() (const genParticle p1, const genParticle p2) const { return ( p1.pt() > p2.pt() ); }
-// //   bool operator() (const math::XYZTLorentzVector p1, const math::XYZTLorentzVector p2) const { return ( p1.pt() > p2.pt() ); }
-// // };
+struct PtComparator
+{
+  bool operator() (const genParticle p1, const genParticle p2) const { return ( p1.pt() > p2.pt() ); }
+  bool operator() (const math::XYZTLorentzVector p1, const math::XYZTLorentzVector p2) const { return ( p1.pt() > p2.pt() ); }
+};
 
 
-// // class HtbKinematics: public BaseSelector {
-// // public:
+class HtbKinematics: public BaseSelector {
+public:
   explicit HtbKinematics(const ParameterSet& config, const TH1* skimCounters);
   virtual ~HtbKinematics() {}
 
