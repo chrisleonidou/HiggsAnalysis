@@ -292,14 +292,20 @@ class BRLimits:
         self.mass = [pair[1] for pair in floatString]
         if len(excludeMassPoints) > 0:
             self.mass = filter(lambda m: not m in excludeMassPoints, self.mass)
-
+            
+        # 29 Nov 2018 (bug fix - if mass points do not exist for one of the channels/analyses/categories or whatever)
+        massList  = [m for m in self.mass if m in limits["masspoints"]]
+        self.mass = massList
+        # Print("self.mass[0] = %s. Is this key in limits[\"masspoints\"]? Answer: %s " % (self.mass[0], self.mass[0] in limits["masspoints"]), True)
         firstMassPoint = limits["masspoints"][self.mass[0]]
+        
 
         if "observed" in firstMassPoint:
             self.observed = [limits["masspoints"][m]["observed"] for m in self.mass]
             members.append("observed")
             if "observed_error" in firstMassPoint:
                 self.observedError = [limits["masspoints"][m]["observed_error"] for m in self.mass]
+
                 members.append("observedError")
         
         self.expectedMedian = [limits["masspoints"][m]["expected"]["median"]  for m in self.mass]
@@ -484,7 +490,7 @@ class BRLimits:
         return isLight
         
 
-    def saveAsLatexTable(self, unblindedStatus=False, nDigits=3, savePath=None):
+    def saveAsLatexTable(self, unblindedStatus=False, nDigits=3, savePath=None, HToTB=False):
         '''
         Save the table as tex format
         '''        
@@ -514,10 +520,14 @@ class BRLimits:
         s  = "% Table autocreated by HiggsAnalysis.LimitCalc.limit.saveAsLatexTable() \n"
         s += "\\begin{tabular}{ c c c c c c c } \n"
         s += "\\hline \n"
-        if isLightHplus:
-	    s += "\\multicolumn{7}{ c }{95\\% CL upper limit on $\\BRtH\\times\\BRHtau$}\\\\ \n"
-	else:
-	    s += "\\multicolumn{7}{ c }{95\\% CL upper limit on $\\sigmaHplus\\times\\BRHtau$}\\\\ \n"
+        if HToTB:
+	    s += "\\multicolumn{7}{ c }{95\\% CL upper limit on $\\BRtH\\times\\BRHtb$}\\\\ \n"
+        else:
+            if isLightHplus:
+                s += "\\multicolumn{7}{ c }{95\\% CL upper limit on $\\BRtH\\times\\BRHtau$}\\\\ \n"
+            else:
+                s += "\\multicolumn{7}{ c }{95\\% CL upper limit on $\\sigmaHplus\\times\\BRHtau$}\\\\ \n"
+
 	s += "\\hline \n"
 	s += "\\mHpm & \\multicolumn{5}{ c }{Expected limit} & Observed \\\\ \\cline{2-6} \n"
 	s += "(GeV)   & $-2\\sigma$  & $-1\\sigma$ & median & +1$\\sigma$ & +2$\\sigma$  & limit \\\\ \n"
