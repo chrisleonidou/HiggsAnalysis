@@ -97,16 +97,25 @@ private:
   
   // GenParticles
   WrappedTH1 *hParticle_Pt;
+  WrappedTH1 *h_bHt_TQuark_Pt;
+  WrappedTH1 *h_bHt_tbW_WBoson_Pt;
+  WrappedTH1 *h_bHt_tbW_BQuark_Pt;
   WrappedTH1 *h_tbH_HPlus_Pt;
   WrappedTH1 *h_tbH_HWh_HBosson_Pt;
   WrappedTH1 *h_tbH_HWh_WBosson_Pt;
   WrappedTH1 *h_tbH_HWh_hDiTau_Tau_Pt;
   //
+  WrappedTH1 *h_bHt_TQuark_Eta;
+  WrappedTH1 *h_bHt_tbW_WBoson_Eta;
+  WrappedTH1 *h_bHt_tbW_BQuark_Eta;
   WrappedTH1 *h_tbH_HPlus_Eta;
   WrappedTH1 *h_tbH_HWh_HBosson_Eta;
   WrappedTH1 *h_tbH_HWh_WBosson_Eta;
   WrappedTH1 *h_tbH_HWh_hDiTau_Tau_Eta;
   //
+  WrappedTH1 *h_bHt_TQuark_Rap;
+  WrappedTH1 *h_bHt_tbW_WBoson_Rap;
+  WrappedTH1 *h_bHt_tbW_BQuark_Rap;
   WrappedTH1 *h_tbH_HPlus_Rap;
   WrappedTH1 *h_tbH_HWh_HBosson_Rap;
   WrappedTH1 *h_tbH_HWh_WBosson_Rap;
@@ -228,16 +237,25 @@ void GenHToHW::book(TDirectory *dir) {
     
   // GenParticles  
   hParticle_Pt            =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "AllParticle_Pt"           , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
+  h_bHt_TQuark_Pt            =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_TQuark_Pt"           , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
+  h_bHt_tbW_WBoson_Pt        =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_tbW_WBoson_Pt"       , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
+  h_bHt_tbW_BQuark_Pt        =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_tbW_BQuark_Pt"       , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_tbH_HPlus_Pt          =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HPlus_Pt"           , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_tbH_HWh_HBosson_Pt    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_HBosson_Pt"           , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_tbH_HWh_WBosson_Pt    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_WBosson_Pt"           , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_tbH_HWh_hDiTau_Tau_Pt    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_hDiTau_Tau_Pt"           , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   //
+  h_bHt_TQuark_Eta            =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_TQuark_Eta"           , ";#eta", nBinsEta, minEta, maxEta);
+  h_bHt_tbW_WBoson_Eta        =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_tbW_WBoson_Eta"       , ";#eta", nBinsEta, minEta, maxEta);
+  h_bHt_tbW_BQuark_Eta        =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_tbW_BQuark_Eta"       , ";#eta", nBinsEta, minEta, maxEta);
   h_tbH_HPlus_Eta         =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HPlus_Eta"            , ";#eta", nBinsEta, minEta, maxEta);
-  h_tbH_HWh_HBosson_Eta   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_HBosson_Eta"            , ";#eta", nBinsEta, minEta, maxEta);
+  h_tbH_HWh_HBosson_Eta   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_WBosson_Eta"            , ";#eta", nBinsEta, minEta, maxEta);
   h_tbH_HWh_WBosson_Eta   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_WBosson_Eta"            , ";#eta", nBinsEta, minEta, maxEta);
   h_tbH_HWh_hDiTau_Tau_Eta   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_hDiTau_Tau_Eta"            , ";#eta", nBinsEta, minEta, maxEta);
   //
+  h_bHt_TQuark_Rap            =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_TQuark_Rap"           , ";#omega", nBinsRap, minRap, maxRap);
+  h_bHt_tbW_WBoson_Rap        =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_tbW_WBoson_Rap"       , ";#omega", nBinsEta, minRap, maxRap);
+  h_bHt_tbW_BQuark_Rap        =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_tbW_BQuark_Rap"       , ";#omega", nBinsEta, minRap, maxRap);
   h_tbH_HPlus_Rap         =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HPlus_Rap"            , ";#omega", nBinsRap, minRap, maxRap);
   h_tbH_HWh_HBosson_Rap   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_HBosson_Rap"            , ";#omega", nBinsRap, minRap, maxRap);  
   h_tbH_HWh_WBosson_Rap   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_WBosson_Rap"            , ";#omega", nBinsRap, minRap, maxRap);	
@@ -426,11 +444,16 @@ void GenHToHW::process(Long64_t entry) {
   if (cfg_Verbose) std::cout << "=== All Selections" << std::endl;
   cSelected.increment();
 
+
+  bool bSkipEvent = false;
   // 4-momenta                                                                                                                                                               
   math::XYZTLorentzVector Htb_HPlus_p4;
   math::XYZTLorentzVector HWh_HBoson_p4;
   math::XYZTLorentzVector HWh_WBoson_p4;
   math::XYZTLorentzVector HWh_hDiTau_p4;
+  math::XYZTLorentzVector bHt_TQuark_p4;
+  math::XYZTLorentzVector bHt_tbW_WBoson_p4;
+  math::XYZTLorentzVector bHt_tbW_BQuark_p4;
   std::vector<math::XYZTLorentzVector> v_ditau_htt_p4;
 
 
@@ -438,8 +461,8 @@ void GenHToHW::process(Long64_t entry) {
   for (auto& p: fEvent.genparticles().getGenParticles()) {
         
     hParticle_Pt -> Fill(p.pt());
-    //int genMom_index = -1;
-    //double genMom_pdgId = -999.99;
+    //int genMom_index = -1; 
+    //double genMom_pdgId = -999.99; 
     // Particle properties
 
     short genP_index     = p.index();
@@ -561,6 +584,32 @@ void GenHToHW::process(Long64_t entry) {
 	  } // end of loop of daughters      
       } // if (abs(genP_pdgId) == 15)                   
     
+
+    if (0) std::cout << "=== Associated top" << std::endl;
+    if ( abs(genP_pdgId) == 6)
+      {
+        if (!bIsLastCopy) continue;
+        // Fill histos                                                                                                                                                      
+        bHt_TQuark_p4 = p.p4();
+        // For-loop: All daughters                                                                                                                                          
+        for (auto& d: genP_daughters)
+          {
+            if ( abs(d.pdgId()) == 5)
+              {
+                bHt_tbW_BQuark_p4 = d.p4();
+              }
+            else if ( abs(d.pdgId()) == 24)
+              {
+                // NOTE: t->Wb dominant, but t->Ws and t->Wd also possible!                                                                                                 
+                bHt_tbW_WBoson_p4 = d.p4();
+              }
+            else bSkipEvent = true;
+          } // for (auto& d: genP_daughters)                                                                                                                                
+      }// if (abs(genP_pdgId) == 6) 
+
+
+
+
     /*
     if (0) std::cout << ".. Collection of Charge Higgs .." << std::endl;
     if (abs(genP_pdgId) == 15)
@@ -590,8 +639,9 @@ void GenHToHW::process(Long64_t entry) {
     double genP_vtxY = vtxIdeal.Y(); // p.vtxY()*10; // in mm
     double genP_vtxZ = vtxIdeal.Z(); // p.vtxZ()*10; // in mm
     */
-
-    /*std::vector<int> genP_daughtersIndex;
+   
+    //com
+    /*    std::vector<int> genP_daughtersIndex;
     for (unsigned int i=0; i < p.daughters().size(); i++){
       genP_daughters.push_back(fEvent.genparticles().getGenParticles()[p.daughters().at(i)]);
       genParticle dau = fEvent.genparticles().getGenParticles()[p.daughters().at(i)];
@@ -602,13 +652,13 @@ void GenHToHW::process(Long64_t entry) {
       genP_mothers.push_back(fEvent.genparticles().getGenParticles()[p.mothers().at(i)]);
       genParticle mom = fEvent.genparticles().getGenParticles()[p.mothers().at(i)];
       genP_mothersIndex.push_back(mom.index());
-    } */
+    } 
  
-    /*if (genMom_index >= 0){
+    if (genMom_index >= 0){
       const Particle<ParticleCollection<double> > m = fEvent.genparticles().getGenParticles()[genMom_index];
       genMom_pdgId = m.pdgId();
-      }*/
-    /*int firstMom = -1, lastMom = -1, firstDau = -1, lastDau = -1;
+    }
+    int firstMom = -1, lastMom = -1, firstDau = -1, lastDau = -1;
     if (genP_mothers.size() > 0){
       firstMom = genP_mothersIndex.at(0);
       lastMom = genP_mothersIndex.at(genP_mothers.size()-1);
@@ -633,9 +683,11 @@ void GenHToHW::process(Long64_t entry) {
     		<< std::setw(12) << genP_mothers.size()
     		<< std::setw(12) << firstDau << std::setw(12) << lastDau
     		<< std::setw(12) << genP_daughters.size() << std::endl;
-		}  */
- 
+		}  
+    */
   }
+  if ( bSkipEvent ) return; 
+  //com
 
   // loop over tau from H^{0}
   if (v_ditau_htt_p4.size() > 1 ) {
@@ -657,10 +709,22 @@ void GenHToHW::process(Long64_t entry) {
   double dR_tbH_WBosson_HWh_HBosson = ROOT::Math::VectorUtil::DeltaR(HWh_HBoson_p4, HWh_WBoson_p4);
   // Fill Gen Histos
   
+  // g->tt (Associated top)
+  h_bHt_TQuark_Pt ->Fill( bHt_TQuark_p4.pt()  );
+  h_bHt_TQuark_Eta->Fill( bHt_TQuark_p4.eta() );
+  h_bHt_TQuark_Rap->Fill( mcTools.GetRapidity(bHt_TQuark_p4) );
   // tb->H+, H+                                                                    
   h_tbH_HPlus_Pt ->Fill( Htb_HPlus_p4.pt()  ); // chris2
   h_tbH_HPlus_Eta->Fill( Htb_HPlus_p4.eta() );
   h_tbH_HPlus_Rap->Fill( mcTools.GetRapidity(Htb_HPlus_p4) );
+  // g->tt, t->bW, W-boson (NOTE: t->Wb dominant, but t->Ws and t->Wd also possible!)                                                                                       
+  h_bHt_tbW_WBoson_Pt ->Fill( bHt_tbW_WBoson_p4.pt()  );
+  h_bHt_tbW_WBoson_Eta->Fill( bHt_tbW_WBoson_p4.eta() );
+  h_bHt_tbW_WBoson_Rap->Fill( mcTools.GetRapidity(bHt_tbW_WBoson_p4) );
+  // g->tt, t->bW, b (NOTE: t->Wb dominant, but t->Ws and t->Wd also possible!)                                                                                             
+  h_bHt_tbW_BQuark_Pt ->Fill( bHt_tbW_BQuark_p4.pt()  );
+  h_bHt_tbW_BQuark_Eta->Fill( bHt_tbW_BQuark_p4.eta() );
+  h_bHt_tbW_BQuark_Rap->Fill( mcTools.GetRapidity(bHt_tbW_BQuark_p4) );
   //H+->HW, H-bosson
   h_tbH_HWh_HBosson_Pt  -> Fill(HWh_HBoson_p4.pt());
   h_tbH_HWh_HBosson_Eta -> Fill(HWh_HBoson_p4.eta());
