@@ -104,6 +104,8 @@ private:
   WrappedTH1 *h_tbH_HWh_HBosson_Pt;
   WrappedTH1 *h_tbH_HWh_WBosson_Pt;
   WrappedTH1 *h_tbH_HWh_hDiTau_Tau_Pt;
+  WrappedTH1 *h_hDiTau_TauDiMu_DiMu_Pt;
+  WrappedTH1 * h_hDiTau_TauDiMu_Pion_Pt; 
   //
   WrappedTH1 *h_bHt_TQuark_Eta;
   WrappedTH1 *h_bHt_tbW_WBoson_Eta;
@@ -112,6 +114,8 @@ private:
   WrappedTH1 *h_tbH_HWh_HBosson_Eta;
   WrappedTH1 *h_tbH_HWh_WBosson_Eta;
   WrappedTH1 *h_tbH_HWh_hDiTau_Tau_Eta;
+  WrappedTH1 *h_hDiTau_TauDiMu_DiMu_Eta;
+  WrappedTH1 *h_hDiTau_TauDiMu_Pion_Eta;
   //
   WrappedTH1 *h_bHt_TQuark_Rap;
   WrappedTH1 *h_bHt_tbW_WBoson_Rap;
@@ -120,6 +124,9 @@ private:
   WrappedTH1 *h_tbH_HWh_HBosson_Rap;
   WrappedTH1 *h_tbH_HWh_WBosson_Rap;
   WrappedTH1 *h_tbH_HWh_hDiTau_Tau_Rap;
+  WrappedTH1 *h_hDiTau_TauDiMu_DiMu_Rap;
+  WrappedTH1 *h_hDiTau_TauDiMu_Pion_Rap;
+
   //
 
   //dR
@@ -244,14 +251,18 @@ void GenHToHW::book(TDirectory *dir) {
   h_tbH_HWh_HBosson_Pt    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_HBosson_Pt"           , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_tbH_HWh_WBosson_Pt    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_WBosson_Pt"           , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_tbH_HWh_hDiTau_Tau_Pt    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_hDiTau_Tau_Pt"           , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
+  h_hDiTau_TauDiMu_DiMu_Pt    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_hDiTau_TauDiMu_DiMu_Pt"           , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
+  h_hDiTau_TauDiMu_Pion_Pt    =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_hDiTau_TauDiMu_Pion_Pt"           , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt); 
   //
   h_bHt_TQuark_Eta            =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_TQuark_Eta"           , ";#eta", nBinsEta, minEta, maxEta);
   h_bHt_tbW_WBoson_Eta        =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_tbW_WBoson_Eta"       , ";#eta", nBinsEta, minEta, maxEta);
   h_bHt_tbW_BQuark_Eta        =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_tbW_BQuark_Eta"       , ";#eta", nBinsEta, minEta, maxEta);
   h_tbH_HPlus_Eta         =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HPlus_Eta"            , ";#eta", nBinsEta, minEta, maxEta);
-  h_tbH_HWh_HBosson_Eta   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_WBosson_Eta"            , ";#eta", nBinsEta, minEta, maxEta);
+  h_tbH_HWh_HBosson_Eta   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_HBosson_Eta"            , ";#eta", nBinsEta, minEta, maxEta);
   h_tbH_HWh_WBosson_Eta   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_WBosson_Eta"            , ";#eta", nBinsEta, minEta, maxEta);
   h_tbH_HWh_hDiTau_Tau_Eta   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_hDiTau_Tau_Eta"            , ";#eta", nBinsEta, minEta, maxEta);
+  h_hDiTau_TauDiMu_DiMu_Eta   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_hDiTau_TauDiMu_DiMu_Eta"            , ";#eta", nBinsEta, minEta, maxEta);
+  h_hDiTau_TauDiMu_Pion_Eta   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_hDiTau_TauDiMu_Pion_Eta"            , ";#eta", nBinsEta, minEta, maxEta);
   //
   h_bHt_TQuark_Rap            =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_TQuark_Rap"           , ";#omega", nBinsRap, minRap, maxRap);
   h_bHt_tbW_WBoson_Rap        =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_tbW_WBoson_Rap"       , ";#omega", nBinsEta, minRap, maxRap);
@@ -260,6 +271,8 @@ void GenHToHW::book(TDirectory *dir) {
   h_tbH_HWh_HBosson_Rap   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_HBosson_Rap"            , ";#omega", nBinsRap, minRap, maxRap);  
   h_tbH_HWh_WBosson_Rap   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_WBosson_Rap"            , ";#omega", nBinsRap, minRap, maxRap);	
   h_tbH_HWh_hDiTau_Tau_Rap   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_hDiTau_Tau_Rap"            , ";#omega", nBinsRap, minRap, maxRap);
+  h_hDiTau_TauDiMu_DiMu_Rap   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_hDiTau_TauDiMu_DiMu_Rap"            , ";#omega", nBinsRap, minRap, maxRap);
+  h_hDiTau_TauDiMu_Pion_Rap   =  fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_hDiTau_TauDiMu_Pion_Rap"            , ";#omega", nBinsRap, minRap, maxRap);
   //
 
   //dR 
@@ -333,7 +346,7 @@ void GenHToHW::process(Long64_t entry) {
   //================================================================================================
   if (cfg_Verbose) std::cout << "=== Tau selection" << std::endl;
   vector<genParticle> selectedTaus = GetGenParticles(fEvent.genparticles().getGenParticles(), cfg_TauPtCut, cfg_TauEtaCut, 15, true, false);
-  if (0)
+  if (0) //despi
     {
       std::cout << "nTaus = " << selectedTaus.size() << std::endl;
       for (auto& p: selectedTaus) std::cout << "\tpT = " << p.pt() << " (GeV/c), eta = " << p.eta() << ", phi = " << p.phi() << " (rads), status = " << p.status() << std::endl;
@@ -455,6 +468,10 @@ void GenHToHW::process(Long64_t entry) {
   math::XYZTLorentzVector bHt_tbW_WBoson_p4;
   math::XYZTLorentzVector bHt_tbW_BQuark_p4;
   std::vector<math::XYZTLorentzVector> v_ditau_htt_p4;
+  std::vector<math::XYZTLorentzVector> v_dimu_htt_p4;
+  std::vector<math::XYZTLorentzVector> v_pion_htt_p4;
+  math::XYZTLorentzVector HWh_hDiTau_HadrTau_p4;
+  math::XYZTLorentzVector HWh_hDiTau_TauDiMu_p4;
 
 
   // For-loop: GenParticles
@@ -493,6 +510,8 @@ void GenHToHW::process(Long64_t entry) {
     genParticle m;
     genParticle g;
     genParticle d;
+    genParticle firstMom;
+    genParticle lastMom;
 
     if (genP_daughters.size() > 0) d = genP_daughters.at(0);
     if (p.mothers().size() > 0)
@@ -523,6 +542,10 @@ void GenHToHW::process(Long64_t entry) {
         genDaus_pdgId.push_back(genP_daughters.at(i).pdgId());
       }
     
+    if (genP_mothers.size() > 0){                                                                                                                                                                          
+      firstMom = genP_mothers.at(0);                                                                                                                                                          
+      lastMom = genP_mothers.at(genP_mothers.size()-1);                                                                                                                                       
+    }  
     // Properties that need to be calculated   
                                                                                                                              
     bool bIsLastCopy  = std::find(genDaus_pdgId.begin(), genDaus_pdgId.end(), genP_pdgId) == genDaus_pdgId.end();
@@ -564,7 +587,7 @@ void GenHToHW::process(Long64_t entry) {
           }// for (auto& d: genP_daughters)  
       } // if (abs(genP_pdgId) == 37)
     
-
+    /* desp2
     if (0) std::cout << ".. Collection of Charge Higgs .." << std::endl;
     if (abs(genP_pdgId) == 25 || abs(genP_pdgId) == 35)
       {
@@ -576,6 +599,11 @@ void GenHToHW::process(Long64_t entry) {
 	      {
 		HWh_hDiTau_p4 = d.p4();
 		v_ditau_htt_p4.push_back (HWh_hDiTau_p4);
+		//if (HWh_hDiTau_p4.pt() < 29.) {
+		   //despi                                                                                                                                                                                            
+		    
+		      // std::cout << "nTaus = " << selectedTaus.size() << std::endl;
+		      
 		// H0-> DiTau                                                                                                                                               
 		//h_tbH_HWh_hDiTau_Tau_Pt  -> Fill(HWh_hDiTau_p4.pt());
 		//h_tbH_HWh_hDiTau_Tau_Eta -> Fill(HWh_hDiTau_p4.eta());
@@ -583,7 +611,37 @@ void GenHToHW::process(Long64_t entry) {
 	      }	  
 	  } // end of loop of daughters      
       } // if (abs(genP_pdgId) == 15)                   
-    
+    */
+
+    if ( abs(genP_pdgId) == 15)
+      {
+	if (!bIsLastCopy) continue;
+	if (abs(firstMom.pdgId()) == 25 || abs(firstMom.pdgId()) == 35) 
+	  {
+	    HWh_hDiTau_p4 = p.p4();
+	    v_ditau_htt_p4.push_back (HWh_hDiTau_p4);
+	    for (auto& d: genP_daughters)
+	      {
+		if ( abs(d.pdgId()) == 211)
+		  {
+		    HWh_hDiTau_HadrTau_p4 = d.p4();
+		    v_pion_htt_p4.push_back (HWh_hDiTau_HadrTau_p4);
+		  }
+		else if ( abs(d.pdgId()) == 13)
+		  {
+		    HWh_hDiTau_TauDiMu_p4 = d.p4();
+		    v_dimu_htt_p4.push_back (HWh_hDiTau_TauDiMu_p4);
+		  }
+	      }
+	  }
+      }
+
+    //if (abs(genP_pdgId) == 15)
+    //{
+    //	if (p.pt() < 29.) {
+    //	  std::cout << "\tpT3 = " << p.pt() << " (GeV/c), eta3 = " << p.eta() << ", phi3 = " << p.phi() <<  std::endl;
+    //	}
+    //}
 
     if (0) std::cout << "=== Associated top" << std::endl;
     if ( abs(genP_pdgId) == 6)
@@ -690,7 +748,8 @@ void GenHToHW::process(Long64_t entry) {
   //com
 
   // loop over tau from H^{0}
-  if (v_ditau_htt_p4.size() > 1 ) {
+  
+  if (v_ditau_htt_p4.size() > 0 ) {
     //for-loop: All taus from H^{0}
     for (size_t i=0; i < v_ditau_htt_p4.size(); i++)
       {
@@ -733,10 +792,26 @@ void GenHToHW::process(Long64_t entry) {
   h_tbH_HWh_WBosson_Pt  -> Fill(HWh_WBoson_p4.pt());
   h_tbH_HWh_WBosson_Eta -> Fill(HWh_WBoson_p4.eta());
   h_tbH_HWh_WBosson_Rap -> Fill( mcTools.GetRapidity(HWh_WBoson_p4) );
-  // H0-> DiTau
-  //h_tbH_HWh_hDiTau_Tau_Pt  -> Fill(HWh_hDiTau_p4.pt());
-  //h_tbH_HWh_hDiTau_Tau_Eta -> Fill(HWh_hDiTau_p4.eta());
-  //h_tbH_HWh_hDiTau_Tau_Rap -> Fill( mcTools.GetRapidity(HWh_hDiTau_p4) );
+  /*
+//H0-> DiTau
+  h_tbH_HWh_hDiTau_Tau_Pt  -> Fill(HWh_hDiTau_p4.pt());                                                                                                                                     
+  h_tbH_HWh_hDiTau_Tau_Eta -> Fill(HWh_hDiTau_p4.eta());                                                                                                                                    
+  h_tbH_HWh_hDiTau_Tau_Rap -> Fill( mcTools.GetRapidity(HWh_hDiTau_p4) );  
+*/
+  // H0-> DiTau -> DiMu
+  if (v_dimu_htt_p4.size() > 0 ) 
+    {
+      h_hDiTau_TauDiMu_DiMu_Pt  -> Fill(HWh_hDiTau_TauDiMu_p4.pt());
+      h_hDiTau_TauDiMu_DiMu_Eta -> Fill(HWh_hDiTau_TauDiMu_p4.eta());
+      h_hDiTau_TauDiMu_DiMu_Rap -> Fill( mcTools.GetRapidity(HWh_hDiTau_TauDiMu_p4) );
+    }  
+  // H0-> DiTau -> Pion
+  if (v_pion_htt_p4.size() > 0 )
+    {  
+      h_hDiTau_TauDiMu_Pion_Pt  -> Fill(HWh_hDiTau_HadrTau_p4.pt());
+      h_hDiTau_TauDiMu_Pion_Eta -> Fill(HWh_hDiTau_HadrTau_p4.eta());
+      h_hDiTau_TauDiMu_Pion_Rap -> Fill( mcTools.GetRapidity(HWh_hDiTau_HadrTau_p4) );
+    }
   // Fill Dr HIstos
   h_tbH_WBosson_HWh_HBosson_dR -> Fill (dR_tbH_WBosson_HWh_HBosson);
   
