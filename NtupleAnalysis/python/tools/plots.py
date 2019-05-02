@@ -202,7 +202,9 @@ _physicalMcAdd = {
     "ChargedHiggs_HplusTB_HplusToTB_M_2000": "ChargedHiggs_HplusTB_HplusToTB_M_2000",
     "ChargedHiggs_HplusTB_HplusToTB_M_2500": "ChargedHiggs_HplusTB_HplusToTB_M_2500",
     "ChargedHiggs_HplusTB_HplusToTB_M_3000": "ChargedHiggs_HplusTB_HplusToTB_M_3000",
-
+    
+    "ChargedHiggs_HplusTB_HplusToHW_M_1500_150_2ta": "ChargedHiggs_HplusTB_HplusToHW_M_1500_150_2ta",
+    "ChargedHiggs_HplusTB_HplusToHW_M_350_150_2ta" : "ChargedHiggs_HplusTB_HplusToHW_M_350_150_2ta",
 
     "TTJets_SingleLeptFromT_madgraph"               : "TTJets_SemiLept",
     "TTJets_SingleLeptFromT_madgraph_ext1"          : "TTJets_SemiLept",
@@ -294,6 +296,21 @@ for mass in _heavyHplusMasses:
 for mass in _heavyHplusToTBbarMasses:
     _physicalToLogical["ChargedHiggs_HplusTB_HplusToTB_M%d"%(mass)] = "HplusTB_M%d"%mass
 
+#chris1
+
+#Mass map: m_H+ : m_H0                                                                                                                                                                                      
+MassMap = {
+    350  : 150,
+    1500 : 150,
+    }
+
+#H0 mass:
+#HzeroMass = [125, 150, 200]
+#HplusTB_HplusToHW
+for key in MassMap:
+    #for mass0 in HzeroMass:
+    _physicalToLogical["ChargedHiggs_HplusTB_HplusToHW_M_%d_%d_2ta"%(key, MassMap[key])] = "HplusHW_M%d_M%d"%(key, MassMap[key])
+    
 _physicalToLogical.update({
         "TTJets"         : "TTJets",
         "TTJets_FullLept": "TTJets_FullLept",
@@ -568,6 +585,10 @@ for mass in _heavyHplusMasses:
     _datasetOrder.append("HplusTB_M%d"%mass)
 for mass in _heavyHplusToTBbarMasses:
     _datasetOrder.append("ChargedHiggs_HplusTB_HplusToTB_M_%d"%mass)
+#for key in MassMap:
+#   _datasetOrder.append("HplusHW_M%d_M%d"%(key, MassMap[key]))
+#chris4
+
 
 _datasetOrder.extend([
     "FakeB", #Htb
@@ -764,6 +785,12 @@ for mass in _heavyHplusToTBbarMasses:
     _legendLabels["ChargedHiggs_HplusTB_HplusToTB_M_%d"%mass] = "H^{+} m_{H^{+}}=%d GeV" % mass
     _legendLabels["HplusToTBbar_M%d"%mass] = "H^{+}#rightarrowtb m_{H^{+}}=%d GeV" % mass
 
+#chris3
+for key in MassMap:
+    _legendLabels["HplusHW_M%d_M%d"%(key, MassMap[key])] = "H^{+} (m_{H^{+}}=%d GeV, m_{H^{0}} = %d GeV)" %(key, MassMap[key])
+    _legendLabels["ChargedHiggs_HplusTB_HplusToHW_M_%d_%d_2ta"%(key, MassMap[key])] = "H^{+} (m_{H^{+}}=%d GeV, m_{H^{0}} = %d GeV)" %(key, MassMap[key])
+
+
 ## Map the logical dataset names to plot styles
 _plotStyles = {
     "ChargedHiggs_HplusTB_HplusToTB_M_180"  : styles.signalStyleHToTB,
@@ -795,7 +822,10 @@ _plotStyles = {
     "HplusTBintermediate_withNeutral_M175": styles.mcStyle2,
     "HplusTBintermediate_M200": styles.mcStyle,
     "HplusTBintermediate_withNeutral_M200": styles.mcStyle2,
-
+    
+    #chris5
+    "ChargedHiggs_HplusTB_HplusToHW_M_1500_150_2ta" : styles.signalStyleHToHW,
+    "ChargedHiggs_HplusTB_HplusToHW_M_350_150_2ta"  : styles.signalStyleHToHW,
 
     "DYJetsToLL"    : styles.dyStyle,
     "DYJetsToLLHT"  : styles.dyStyle,
@@ -878,9 +908,19 @@ for mass in _intermediateHplusMasses:
 
 for mass in _heavyHplusMasses:
     _plotStyles["HplusTB_M%d"%mass] = getattr(styles, "signal%dStyle"%mass)
-
+    
 for mass in _heavyHplusToTBbarMasses:
     _plotStyles["HplusTB_M%d"%mass] = getattr(styles, "signal%dStyle"%mass)
+
+#chris2
+#Mass map: m_H+ : m_H0
+#MassMap = {
+#   350  : 150,
+#  1500 : 150,
+# }
+    
+for key in MassMap:
+    _plotStyles["HplusHW_M%d_M%d"%(key, MassMap[key])] = getattr(styles, "signalStyleH%dToHW%d"%(key, MassMap[key]))
 
 
 #================================================================================================
@@ -890,7 +930,7 @@ def isSignal(name):
     '''
     Return True if name is from a signal dataset
     '''
-    return "H^{#pm}" in name or "TTToHplus" in name or "Hplus_taunu" in name or "TTOrTToHplus" in name or "HplusTB" in name
+    return "H^{#pm}" in name or "TTToHplus" in name or "Hplus_taunu" in name or "TTOrTToHplus" in name or "HplusTB" in name or "HplusHW" in name
 
 def updateLegendLabel(datasetName, legendLabel):
     '''
