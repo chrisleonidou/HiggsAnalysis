@@ -431,6 +431,19 @@ signalStyleHToTB3000 = StyleCompound([StyleMarker(markerSize=0.0, markerColor=RO
                                    StyleLine(lineColor=ROOT.kRed+2, lineStyle=ROOT.kDashed, lineWidth=3), 
                                    StyleFill(fillColor=ROOT.kRed+2, fillStyle=0)])
 
+#chris1
+signalStyleHToHW  = StyleCompound([StyleMarker(markerSize=0, markerColor=ROOT.kMagenta, markerSizes=None, markerStyle=4),
+                                   StyleLine(lineColor=ROOT.kMagenta, lineStyle=ROOT.kSolid, lineWidth=4),
+                                   StyleFill(fillColor=ROOT.kMagenta, fillStyle=0)])
+
+signalStyleH1500ToHW150  = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kRed+2, markerSizes=None, markerStyle=4),
+                                          StyleLine(lineColor=ROOT.kRed+2, lineStyle=ROOT.kSolid, lineWidth=1),
+                                          StyleFill(fillColor=ROOT.kRed+2, fillStyle=0)])
+
+signalStyleH350ToHW150   = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kViolet-9, markerSizes=None, markerStyle=4),
+                                          StyleLine(lineColor=ROOT.kViolet-9, lineStyle=ROOT.kSolid, lineWidth=1),
+                                          StyleFill(fillColor=ROOT.kViolet-9, fillStyle=0)])
+
 # FakeB Style
 FakeBStyle1 = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
                                    StyleLine(lineColor=ROOT.kRed, lineStyle=ROOT.kSolid, lineWidth=3), 
@@ -636,6 +649,25 @@ def getSignalStyleHToTB_M(myMass):
     else:
         print "Invalid mass point \"%s\". Returning default style" % (mass)
     return signalStyleHToTB500        
+
+#chris2
+
+def getSignalStyleHToHW():
+    return signalStyleHToHW
+
+def getSignalStyleHToHW_M(myMass, myMass0):
+
+    mass = str(myMass)
+    mass0 = str(myMass0)
+
+    if mass == "1500" and mass0 == "150":
+        return signalStyleH1500ToHW150
+    elif mass == "350" and mass0 == "150":
+        return signalStyleH350ToHW150
+    else:
+        print "Invalid mass point mH+ = %s, mH0 = %s. Returning default style" % (mass, mass0)
+    return signalStyleH1500ToHW150
+    
 
 def getErrorStyle():
     return errorStyle
