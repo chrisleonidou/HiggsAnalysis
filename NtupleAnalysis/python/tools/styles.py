@@ -432,17 +432,25 @@ signalStyleHToTB3000 = StyleCompound([StyleMarker(markerSize=0.0, markerColor=RO
                                    StyleFill(fillColor=ROOT.kRed+2, fillStyle=0)])
 
 #chris1
-signalStyleHToHW  = StyleCompound([StyleMarker(markerSize=0, markerColor=ROOT.kMagenta, markerSizes=None, markerStyle=4),
-                                   StyleLine(lineColor=ROOT.kMagenta, lineStyle=ROOT.kSolid, lineWidth=4),
+signalStyleHToHW  = StyleCompound([StyleMarker(markerSize=0, markerColor=ROOT.kMagenta, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                                   StyleLine(lineColor=ROOT.kMagenta, lineStyle=ROOT.kSolid, lineWidth=1),
                                    StyleFill(fillColor=ROOT.kMagenta, fillStyle=0)])
 
-signalStyleH1500ToHW150  = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kRed+2, markerSizes=None, markerStyle=4),
-                                          StyleLine(lineColor=ROOT.kRed+2, lineStyle=ROOT.kSolid, lineWidth=1),
-                                          StyleFill(fillColor=ROOT.kRed+2, fillStyle=0)])
+signalStyleH1500ToHW150  = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kBlue, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                                          StyleLine(lineColor=ROOT.kBlue, lineStyle=ROOT.kSolid, lineWidth=1),
+                                          StyleFill(fillColor=ROOT.kBlue, fillStyle=0)])
 
-signalStyleH350ToHW150   = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kViolet-9, markerSizes=None, markerStyle=4),
-                                          StyleLine(lineColor=ROOT.kViolet-9, lineStyle=ROOT.kSolid, lineWidth=1),
-                                          StyleFill(fillColor=ROOT.kViolet-9, fillStyle=0)])
+signalStyleH350ToHW150   = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                                          StyleLine(lineColor=ROOT.kRed, lineStyle=ROOT.kSolid, lineWidth=1),
+                                          StyleFill(fillColor=ROOT.kRed, fillStyle=0)])
+
+signalStyleH300ToHW200   = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                                          StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=1),
+                                          StyleFill(fillColor=ROOT.kBlack, fillStyle=0)])
+
+signalStyleH1500ToHW125  = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kGreen, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                                          StyleLine(lineColor=ROOT.kGreen, lineStyle=ROOT.kSolid, lineWidth=1),
+                                          StyleFill(fillColor=ROOT.kGreen, fillStyle=0)])
 
 # FakeB Style
 FakeBStyle1 = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
@@ -664,9 +672,13 @@ def getSignalStyleHToHW_M(myMass, myMass0):
         return signalStyleH1500ToHW150
     elif mass == "350" and mass0 == "150":
         return signalStyleH350ToHW150
+    elif mass == "300" and mass0 == "200":
+        return signalStyleH300ToHW200
+    elif mass == "1500" and mass0 == "125":
+        return signalStyleH1500ToHW125
     else:
         print "Invalid mass point mH+ = %s, mH0 = %s. Returning default style" % (mass, mass0)
-    return signalStyleH1500ToHW150
+    return signalStyleH300ToHW200
     
 
 def getErrorStyle():

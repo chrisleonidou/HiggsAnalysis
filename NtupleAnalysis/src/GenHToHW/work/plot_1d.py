@@ -197,7 +197,7 @@ def GetHistoKwargs(histo, opts):
     else:
         yLabel = "Events"
     logY       = False
-    yMaxFactor = 1.2
+    yMaxFactor = 1.2 #chris
 
     # Create with default values
     kwargs = {
@@ -216,7 +216,7 @@ def GetHistoKwargs(histo, opts):
         "opts"             : {"ymin": 0.0, "ymaxfactor": yMaxFactor},
         "opts2"            : {"ymin": 0.0, "ymax": 2.0},
         "log"              : logY,
-        "moveLegend"       : {"dx": -0.61, "dy": 0.0, "dh": -3.0}, #chris dx{-0,1 -> -0.7} , dh {-0,1->0.5}
+        "moveLegend"       : {"dx": -0.35, "dy": 0.0, "dh": -0.1}, #chris dx{-0,1 -> -0.7} , dh {-0,1->0.5}
         "cutBox"           : {"cutValue": 0.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
         }
 
@@ -343,7 +343,7 @@ def GetHistoKwargs(histo, opts):
         yMin = 1e0
 
     if kwargs["log"] == True:
-        yMaxFactor = 2
+        yMaxFactor = 2 #chris
     else:
         yMaxFactor = 1.2
 
@@ -374,7 +374,7 @@ def PlotMC(datasetsMgr, histo, intLumi):
                    #createLegend = {"x1": 0.62, "y1": 0.75, "x2": 0.92, "y2": 0.92},
                    moveLegend   = kwargs.get("moveLegend"),
                    opts         = kwargs.get("opts"),
-                   opts2        = {"ymin": 0.6, "ymax": 1.4},
+                   opts2        = {"ymin": 0.6, "ymax": 1.4}, #chris 1.4
                    cutBox       = kwargs.get("cutBox"),
                    )
 
@@ -407,7 +407,7 @@ def SavePlot(plot, saveName, saveDir, saveFormats = [".C", ".png", ".pdf"]):
     # For-loop: All save formats
     for i, ext in enumerate(saveFormats, 1):
         saveNameURL = savePath + ext
-        saveNameURL = saveNameURL.replace("/publicweb/a/aattikis/", "http://home.fnal.gov/~aattikis/")
+        saveNameURL = saveNameURL.replace("/publicweb/c/cleonido/", "http://home.fnal.gov/~cleonido/")
         if opts.url:
             Print(saveNameURL, i==0)
         else:
@@ -447,7 +447,7 @@ if __name__ == "__main__":
     LATEX        = False
     URL          = False
     NOERROR      = True
-    SAVEDIR      = "/uscms_data/d3/cleonido/workspace/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/src/GenHToHW/work" #None #"/publicweb/a/aattikis/" + ANALYSISNAME
+    SAVEDIR      = None  #"/uscms_data/d3/cleonido/workspace/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/src/GenHToHW/work" #None #"/publicweb/a/aattikis/" + ANALYSISNAME
     VERBOSE      = False
     HISTOLEVEL   = "Vital" # 'Vital' , 'Informative' , 'Debug'
     NORMALISE    = False
