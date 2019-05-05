@@ -109,7 +109,7 @@ def main(opts):
         # Setup & configure the dataset manager 
         datasetsMgr    = GetDatasetsFromDir(opts)
         datasetsMgr.updateNAllEventsToPUWeighted()
-        datasetsMgr.loadLuminosities() # from lumi.json
+        #datasetsMgr.loadLuminosities() # from lumi.json
 
         # Set/Overwrite cross-sections
         for d in datasetsMgr.getAllDatasets():
@@ -421,7 +421,7 @@ def Plot2d(datasetsMgr, dataset, histoName, kwargs, opts):
         histograms.addText(0.17, 0.88, plots._legendLabels[dataset], 27)
 
     # Save the plots
-    SavePlot(p, saveName, os.path.join(opts.saveDir, opts.analysisName, opts.folder, dataset, opts.optMode), [".png", ".pdf"] )
+    SavePlot(p, saveName, os.path.join(opts.saveDir, opts.analysisName, opts.folder, dataset, opts.optMode), [".png"] ) # [".png", ".pdf"] 
     return
 
 def HasKeys(keyList, **kwargs):
@@ -460,7 +460,7 @@ def SavePlot(plot, plotName, saveDir, saveFormats = [".png"]):
     # For-loop: All save formats
     for i, ext in enumerate(saveFormats):
         saveNameURL = saveName + ext
-        saveNameURL = saveNameURL.replace("/publicweb/a/aattikis/", "http://home.fnal.gov/~aattikis/")
+        saveNameURL = saveNameURL.replace("/publicweb/c/cleonido/", "http://home.fnal.gov/~cleonido/")
         if i==0:
             print "=== plot_2d.py:"
 
@@ -493,7 +493,7 @@ if __name__ == "__main__":
     '''
     
     # Default Settings
-    ANALYSISNAME = "HtbKinematics"
+    ANALYSISNAME = "GenHToHW"
     SEARCHMODE   = "80to1000"
     DATAERA      = "Run2016"
     OPTMODE      = None
@@ -505,7 +505,7 @@ if __name__ == "__main__":
     MERGEEWK     = False
     URL          = False
     NOERROR      = True
-    SAVEDIR      = "/publicweb/a/aattikis/"
+    SAVEDIR      = "/publicweb/c/cleonido/"   #"/publicweb/a/aattikis/"
     VERBOSE      = False
     HISTOLEVEL   = "Vital" # 'Vital' , 'Informative' , 'Debug' 
     FOLDER       = "TH2"

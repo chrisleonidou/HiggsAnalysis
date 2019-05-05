@@ -156,7 +156,7 @@ def main():
     
     allSelections.TauSelection.triggerMatchingApply = False
     allSelections.TauSelection.triggerMatchingCone  =  0.1
-    allSelections.TauSelection.tauPtCut             = 30.0
+    allSelections.TauSelection.tauPtCut             =  30.0
     allSelections.TauSelection.tauEtaCut            =  2.1
     allSelections.TauSelection.tauLdgTrkPtCut       =  0.0
     allSelections.TauSelection.prongs               = -1
