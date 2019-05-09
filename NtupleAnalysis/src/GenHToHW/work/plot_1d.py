@@ -447,7 +447,7 @@ if __name__ == "__main__":
     LATEX        = False
     URL          = False
     NOERROR      = True
-    SAVEDIR      = None  #"/uscms_data/d3/cleonido/workspace/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/src/GenHToHW/work" #None #"/publicweb/a/aattikis/" + ANALYSISNAME
+    SAVEDIR      = "/publicweb/c/cleonido/"  #"/uscms_data/d3/cleonido/workspace/CMSSW_8_0_30/src/HiggsAnalysis/NtupleAnalysis/src/GenHToHW/work" #None #"/publicweb/a/aattikis/" + ANALYSISNAME
     VERBOSE      = False
     HISTOLEVEL   = "Vital" # 'Vital' , 'Informative' , 'Debug'
     NORMALISE    = False
