@@ -379,17 +379,44 @@ bool MCTools::HasMother(const genParticle &p,
 
   // Ensure the particle has a mother!
   if (p.mothers().size() < 1) return false;
-
   // For-loop: All mothers
   for (size_t iMom = 0; iMom < p.mothers().size(); iMom++)
     {
-
       int mom_index =  p.mothers().at(iMom);
       const genParticle m = fEvent->genparticles().getGenParticles()[mom_index];
       if (m.pdgId() == mom_pdgId) return true;
       else continue;
-
     }
-
   return false;
+}
+
+bool MCTools::HasGenPartMother(const genParticle &p)
+{
+  if (p.mothers().size() < 1) return false;
+  return true;
+}
+
+int MCTools::RecursivelyLookForMotherId(const genParticle &p)
+{
+  //  Description:                                                                                                                                                                                                
+  //  Returns mother Id.
+  int moId ;
+  if (p.mothers().size() < 1) return 1564;
+  // For-loop: All mothers                                                                                                                                                                                 
+  for (size_t iMom = 0; iMom < p.mothers().size(); iMom++)
+    {
+      int mom_index =  p.mothers().at(iMom);
+      const genParticle m = fEvent->genparticles().getGenParticles()[mom_index];
+      moId = m.pdgId();
+      if (moId != p.pdgId()) return moId;	
+      if (HasGenPartMother(m)) 
+	{
+	  if (0) std::cout << "m.pdgId()" << m.pdgId()  << std::endl;
+	  moId = RecursivelyLookForMotherId(m);
+	  return moId;
+	}
+    }
+  
+  return 1515;
+  
 }

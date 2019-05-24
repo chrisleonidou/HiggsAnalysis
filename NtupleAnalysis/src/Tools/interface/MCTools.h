@@ -39,7 +39,8 @@ public:
   void PrintGenParticle(const genParticle &genP, bool bPrintHeaders=true);
   void PrintGenDaughters(const genParticle &genP);
   bool HasMother(const genParticle &p, const int mom_pdgId);
-
+  int RecursivelyLookForMotherId(const genParticle &p);
+  bool HasGenPartMother(const genParticle &p);
 private:
   Event *fEvent;
   Tools auxTools;

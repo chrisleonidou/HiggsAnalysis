@@ -433,23 +433,23 @@ signalStyleHToTB3000 = StyleCompound([StyleMarker(markerSize=0.0, markerColor=RO
 
 #chris1
 signalStyleHToHW  = StyleCompound([StyleMarker(markerSize=0, markerColor=ROOT.kMagenta, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
-                                   StyleLine(lineColor=ROOT.kMagenta, lineStyle=ROOT.kSolid, lineWidth=1),
+                                   StyleLine(lineColor=ROOT.kMagenta, lineStyle=ROOT.kSolid, lineWidth=3),
                                    StyleFill(fillColor=ROOT.kMagenta, fillStyle=0)])
 
 signalStyleH1500ToHW150  = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kBlue, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
-                                          StyleLine(lineColor=ROOT.kBlue, lineStyle=ROOT.kSolid, lineWidth=1),
+                                          StyleLine(lineColor=ROOT.kBlue, lineStyle=ROOT.kSolid, lineWidth=3),
                                           StyleFill(fillColor=ROOT.kBlue, fillStyle=0)])
 
 signalStyleH350ToHW150   = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
-                                          StyleLine(lineColor=ROOT.kRed, lineStyle=ROOT.kSolid, lineWidth=1),
+                                          StyleLine(lineColor=ROOT.kRed, lineStyle=ROOT.kSolid, lineWidth=3),
                                           StyleFill(fillColor=ROOT.kRed, fillStyle=0)])
 
 signalStyleH300ToHW200   = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kBlack, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
-                                          StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=1),
+                                          StyleLine(lineColor=ROOT.kBlack, lineStyle=ROOT.kSolid, lineWidth=3),
                                           StyleFill(fillColor=ROOT.kBlack, fillStyle=0)])
 
 signalStyleH1500ToHW125  = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kGreen, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
-                                          StyleLine(lineColor=ROOT.kGreen, lineStyle=ROOT.kSolid, lineWidth=1),
+                                          StyleLine(lineColor=ROOT.kGreen, lineStyle=ROOT.kSolid, lineWidth=3),
                                           StyleFill(fillColor=ROOT.kGreen, fillStyle=0)])
 
 # FakeB Style

@@ -197,7 +197,7 @@ def GetHistoKwargs(histo, opts):
     else:
         yLabel = "Events"
     logY       = False
-    yMaxFactor = 1.2 #chris
+    yMaxFactor = 3 #1.2 chris
 
     # Create with default values
     kwargs = {
@@ -214,7 +214,7 @@ def GetHistoKwargs(histo, opts):
         "addCmsText"       : True,
         "cmsExtraText"     : "Preliminary",
         "opts"             : {"ymin": 0.0, "ymaxfactor": yMaxFactor},
-        "opts2"            : {"ymin": 0.0, "ymax": 2.0},
+        "opts2"            : {"ymin": 0.0, "ymax": 3.0}, #2
         "log"              : logY,
         "moveLegend"       : {"dx": -0.35, "dy": 0.0, "dh": -0.1}, #chris dx{-0,1 -> -0.7} , dh {-0,1->0.5}
         "cutBox"           : {"cutValue": 0.0, "fillColor": 16, "box": False, "line": False, "greaterThan": True}
@@ -343,9 +343,9 @@ def GetHistoKwargs(histo, opts):
         yMin = 1e0
 
     if kwargs["log"] == True:
-        yMaxFactor = 2 #chris
+        yMaxFactor = 2 #2chris for eta 16
     else:
-        yMaxFactor = 1.2
+        yMaxFactor = 1.2 #1.2 for eta 16 for dphi 1.6
 
     # Finalise and return
     kwargs["opts"]["ymaxfactor"] = yMaxFactor
@@ -374,7 +374,7 @@ def PlotMC(datasetsMgr, histo, intLumi):
                    #createLegend = {"x1": 0.62, "y1": 0.75, "x2": 0.92, "y2": 0.92},
                    moveLegend   = kwargs.get("moveLegend"),
                    opts         = kwargs.get("opts"),
-                   opts2        = {"ymin": 0.6, "ymax": 1.4}, #chris 1.4
+                   opts2        = {"ymin": 0.6, "ymax": 3}, #chris 1.4
                    cutBox       = kwargs.get("cutBox"),
                    )
 
