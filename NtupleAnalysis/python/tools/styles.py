@@ -319,7 +319,7 @@ stStyle           = Style(ROOT.kPlus, ROOT.kSpring+4)
 stsStyle          = Style(ROOT.kPlus, ROOT.kSpring-9)
 sttStyle          = Style(ROOT.kPlus, ROOT.kSpring-7)
 sttwStyle         = stStyle
-ttStyle           = Style(ROOT.kFullSquare, ROOT.kMagenta-2)
+ttStyle           = StyleCompound([StyleFill(fillColor=ROOT.kMagenta-2)])
 ttbbStyle         = Style(ROOT.kOpenCross, ROOT.kPink-9)
 ttjetsStyle       = Style(ROOT.kPlus, ROOT.kMagenta-4)
 ttttStyle         = Style(ROOT.kFullStar, ROOT.kYellow-9)
@@ -452,6 +452,13 @@ signalStyleH1500ToHW125  = StyleCompound([StyleMarker(markerSize=0.0, markerColo
                                           StyleLine(lineColor=ROOT.kGreen, lineStyle=ROOT.kSolid, lineWidth=3),
                                           StyleFill(fillColor=ROOT.kGreen, fillStyle=0)])
 
+signalStyleH350ToHW125  = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kViolet, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                                          StyleLine(lineColor=ROOT.kViolet, lineStyle=ROOT.kSolid, lineWidth=3),
+                                          StyleFill(fillColor=ROOT.kViolet, fillStyle=0)])
+
+signalStyleH700ToHW200   = StyleCompound([StyleMarker(markerSize=0.0, markerColor=ROOT.kBlue, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
+                                          StyleLine(lineColor=ROOT.kBlue, lineStyle=ROOT.kSolid, lineWidth=3),
+                                          StyleFill(fillColor=ROOT.kBlue, fillStyle=0)])
 # FakeB Style
 FakeBStyle1 = StyleCompound([StyleMarker(markerSize=1.2, markerColor=ROOT.kRed, markerSizes=None, markerStyle=ROOT.kFullTriangleUp),
                                    StyleLine(lineColor=ROOT.kRed, lineStyle=ROOT.kSolid, lineWidth=3), 
@@ -676,6 +683,10 @@ def getSignalStyleHToHW_M(myMass, myMass0):
         return signalStyleH300ToHW200
     elif mass == "1500" and mass0 == "125":
         return signalStyleH1500ToHW125
+    elif mass == "700" and mass0 == "200":
+        return signalStyleH700ToHW200
+    elif mass == "350" and mass0 == "125":
+        return signalStyleH350ToHW125
     else:
         print "Invalid mass point mH+ = %s, mH0 = %s. Returning default style" % (mass, mass0)
     return signalStyleH300ToHW200
