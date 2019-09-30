@@ -72,8 +72,7 @@ bool MCTools::IsLepton(const int pdgId){
   //
 
   if( (abs(pdgId) == 11) || (abs(pdgId) == 12)  ||
-      (abs(pdgId) == 13) || (abs(pdgId) == 14)  ||
-      (abs(pdgId) == 15) || (abs(pdgId) == 16) ) return true;
+      (abs(pdgId) == 13) || (abs(pdgId) == 14) ) return true;
   else return false;
 }
 

@@ -39,6 +39,8 @@ public:
   virtual vector<GenJet> GetGenJets(const vector<GenJet> genJets, std::vector<float> ptCut, std::vector<float> etaCut, vector<genParticle> genParticlesToMatch);
   virtual vector<genParticle> GetGenParticles(const vector<genParticle> genParticles, double ptCut, double etaCut, const int pdgId, const bool isLastCopy=true, const bool hasNoDaughters=false);
   virtual double GetMt(const math::XYVector tau1, const math::XYVector tau2, const math::XYVector muon, const math::XYVector& met);
+  virtual double GetWMt(const math::XYVector muon, const math::XYVector& met);
+  virtual double GetWMt2(const math::XYZTLorentzVector muon, const math::XYZTLorentzVector neut);
 private:
   // Input parameters
   const double cfg_Verbose;
@@ -82,6 +84,8 @@ private:
   Count cJetSelection;
   Count cBJetSelection;
   Count cMETSelection;
+  //HPlus selection fat taus
+  Count cHPlusDRCut;
   // Count cTopologySelection;
   Count cTopSelection;
   Count cSelected;
@@ -107,7 +111,7 @@ private:
   Count csquark2;
   Count csquark3;
   Count csquark4;
-
+  
   // GenParticles
   WrappedTH1 *hParticle_Pt;
   WrappedTH1 *h_bHt_TQuark_Pt;
@@ -117,7 +121,6 @@ private:
   WrappedTH1 *h_tbH_HWh_HBoson_Pt;
   WrappedTH1 *h_tbH_HWh_WBoson_Pt;
   WrappedTH1 *h_tbH_HWh_hDiTau_Tau_Pt;
-  WrappedTH1 *h_hDiTau_TauDiMu_DiMu_Pt;
   WrappedTH1 *h_hDiTau_TauDiMu_Pion_Pt;
   WrappedTH1 *h_Wqq_Quark_Pt;
   WrappedTH1 *h_Wqq_AntiQuark_Pt;
@@ -126,6 +129,9 @@ private:
   WrappedTH1 *h_leadBQuark_pt;
   WrappedTH1 *h_Wqq_Quarks_Pt;
   WrappedTH1 *h_Wln_Lepton_Pt;
+  WrappedTH1 *h_tbH_HPlus_DRCut_Pt;
+  WrappedTH1 *h_tbH_HWh_WBoson_DRCut_Pt;
+  WrappedTH1 *h_bHt_TQuark_DRCut_Pt;
   //
   WrappedTH1 *h_tbH_BQuark_dPhiTH_Cut1_Pt;
   WrappedTH1 *h_tbH_BQuark_dPhiTH_Cut2_Pt;
@@ -138,7 +144,6 @@ private:
   WrappedTH1 *h_tbH_HWh_HBoson_Eta;
   WrappedTH1 *h_tbH_HWh_WBoson_Eta;
   WrappedTH1 *h_tbH_HWh_hDiTau_Tau_Eta;
-  WrappedTH1 *h_hDiTau_TauDiMu_DiMu_Eta;
   WrappedTH1 *h_hDiTau_TauDiMu_Pion_Eta;
   WrappedTH1 *h_Wqq_Quark_Eta;
   WrappedTH1 *h_Wqq_AntiQuark_Eta;
@@ -154,7 +159,6 @@ private:
   WrappedTH1 *h_tbH_HWh_HBoson_Rap;
   WrappedTH1 *h_tbH_HWh_WBoson_Rap;
   WrappedTH1 *h_tbH_HWh_hDiTau_Tau_Rap;
-  WrappedTH1 *h_hDiTau_TauDiMu_DiMu_Rap;
   WrappedTH1 *h_hDiTau_TauDiMu_Pion_Rap;
   WrappedTH1 *h_Wqq_Quark_Rap;
   WrappedTH1 *h_Wqq_AntiQuark_Rap;
@@ -205,10 +209,11 @@ private:
   WrappedTH1 *h_tbH_BQuark_HWh_HPlus_dPhi;
   WrappedTH1 *h_tbH_BQuark_twb_TQuark_dPhi;
   WrappedTH1 *h_Wqq_leadQuark_tbqq_Quark_dPhi;
-  WrappedTH1 *h_HWh_WBoson_neut_HWh_HBoson_neut_Dphi;
-  WrappedTH1 *h_HWh_HBoson_neut_Met_dPhi;
+  WrappedTH1 *h_HWh_WBoson_neut_HWh_HBoson_neut_dPhi;
   WrappedTH1 *h_HWh_hDiTau_Tau_Tau_dPhi;
   WrappedTH1 *h_HWh_Wmuon_Muon_HWh_h_Tau_dPhi;
+  WrappedTH1 *h_HWh_hDiTauNeut_DiTau_dPhi;
+  WrappedTH1 *h_HWh_WBoson_neut_HWh_WBoson_muon_dPhi;
   //
   WrappedTH1 *h_tbH_HWh_WBoson_HBoson_dEta;
   WrappedTH1 *h_tbH_HPlus_top_dEta;
@@ -231,9 +236,11 @@ private:
   //
   WrappedTH1 *h_tbH_WBoson_HWh_HBoson_dRap;
   //
-  WrappedTH1 *h_muonPtTauVsPt;
   WrappedTH1 *h_MET_Pt;
   WrappedTH1 *h_MET_Et;
+  WrappedTH1 *h_MET_from_HWh_h_Et;
+  WrappedTH1 *h_MET_from_HWh_W_Et;
+  WrappedTH1 *h_MET_from_tbH_H_Et;
   //
   WrappedTH2 *h_tbH_WBoson_HWh_HBoson_dEta_Vs_dPhi;
   WrappedTH2 *h_tbH_HPlus_top_dEta_Vs_dPhi;
@@ -273,6 +280,7 @@ private:
   WrappedTH2 *h_tbH_BQuark_tbqq_subleadQuark_dR_Vs_Pt;
   WrappedTH2 *h_HWh_hDiTau_Tau_Tau_dR_Vs_Pt;
   //
+  WrappedTH2 *h_HWh_HBoson_HWh_WBoson_Pt_Vs_Pt;
   WrappedTH1 *h_HWh_hDiTau_Tau_MET_dPhi;
   WrappedTH1 *h_twb_Wqq_Quark_MET_dPhi;
   WrappedTH1 *h_HWh_Wmn_Muon_MET_dPhi;
@@ -284,20 +292,25 @@ private:
   //
   WrappedTH1 *h_InitialEOverFinalE;
   //
-  WrappedTH1 *h_mT_ChargeHiggs_M;
-  WrappedTH1 *h_mT_ChargeHiggsMeTTau_M;
-  WrappedTH1 *h_mT_ChargeHiggsMeTTau_Cut1_M;
-  WrappedTH1 *h_mT_ChargeHiggsMeTTau_Cut2_M;
-  WrappedTH1 *h_mT_ChargeHiggs_assW_hadr_M;
-  WrappedTH1 *h_mT_ChargeHiggs_assW_lept_M;
-  WrappedTH1 *h_mT_ChargeHiggs_assMuon_M;
-  WrappedTH1 *h_mT_ChargeHiggs_assqq_M;
-  WrappedTH1 *h_mT_ChargeHiggs_taudPhils_M;
-  WrappedTH1 *h_mT_ChargeHiggs_taudPhigr_M;
-  WrappedTH1 *h_mT_ChargeHiggs_OneAnyMuon_M;
-  WrappedTH1 *h_mT_ChargeHiggs_hptMuon_M;
+  WrappedTH1 *h_mT_ChargeHiggs_MT;
+  WrappedTH1 *h_mT_ChargeHiggsMeTfromH_MT;
+  WrappedTH1 *h_mT_ChargeHiggsMeTTau_Cut1_MT;
+  WrappedTH1 *h_mT_ChargeHiggsMeTTau_Cut2_MT;
+  WrappedTH1 *h_mT_ChargeHiggs_assW_hadr_MT;
+  WrappedTH1 *h_mT_ChargeHiggs_assW_lept_MT;
+  WrappedTH1 *h_mT_ChargeHiggs_assMuon_MT;
+  WrappedTH1 *h_mT_ChargeHiggs_assqq_MT;
+  WrappedTH1 *h_mT_ChargeHiggs_taudPhils_MT;
+  WrappedTH1 *h_mT_ChargeHiggs_taudPhigr_MT;
+  WrappedTH1 *h_mT_ChargeHiggs_OneAnyMuon_MT;
+  WrappedTH1 *h_mT_ChargeHiggs_hptMuon_MT;
+  WrappedTH1 *h_mT_HWh_W_MT;
+  WrappedTH1 *h_mT_HWh_met_tau_W_MT;
+  WrappedTH1 *h_mT_HWh_WCor_MT;
   //
-  WrappedTH2 *h_HWh_HBoson_neut_Met_dPhi_Vs_HWh_WBoson_neut_HWh_HBoson_neut_dPhi;
+  WrappedTH1 *h_HWh_h_tau_M;
+  WrappedTH1 *h_HWh_h_M;
+  WrappedTH1 *h_HWh_W_muon_M;
   //
   WrappedTH1 *h_leadquarknumber;
   WrappedTH1 *h_subleadquarknumber;
@@ -358,7 +371,9 @@ GenHToHW::GenHToHW(const ParameterSet& config, const TH1* skimCounters)
     cJetSelection(fEventCounter.addCounter("Jets + H_{T}")),
     cBJetSelection(fEventCounter.addCounter("b-jets")),
     cMETSelection(fEventCounter.addCounter("MET")),
+    //cHPlusDRCut(fEventCounter.addCounter("HPlusDRCut")),
     // cTopologySelection(fEventCounter.addCounter("Topology")),
+    cHPlusDRCut(fEventCounter.addCounter("HPlusDRCut")),
     cTopSelection(fEventCounter.addCounter("Top")),
     cSelected(fEventCounter.addCounter("All Selections")),
     cInclusive(fEventCounter.addSubCounter("Branching", "All events")),
@@ -401,10 +416,7 @@ void GenHToHW::book(TDirectory *dir) {
   // const int nBinsPhi  = cfg_PhiBinSetting.bins();
   // const double minPhi = cfg_PhiBinSetting.min();
   // const double maxPhi = cfg_PhiBinSetting.max();
-
-  const int nBinsM  = cfg_MassBinSetting.bins();
   const double minM = cfg_MassBinSetting.min();
-  const double maxM = cfg_MassBinSetting.max();
   
   const int nBinsdEta  = 2*cfg_DeltaEtaBinSetting.bins();
   const double mindEta = cfg_DeltaEtaBinSetting.min();
@@ -442,7 +454,6 @@ void GenHToHW::book(TDirectory *dir) {
   h_tbH_HWh_HBoson_Pt           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_HBoson_Pt"      , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_tbH_HWh_WBoson_Pt           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_WBoson_Pt"      , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_tbH_HWh_hDiTau_Tau_Pt       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_hDiTau_Tau_Pt"  , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
-  h_hDiTau_TauDiMu_DiMu_Pt      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_hDiTau_TauDiMu_DiMu_Pt" , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_hDiTau_TauDiMu_Pion_Pt      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_hDiTau_TauDiMu_Pion_Pt" , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt); 
   h_Wqq_Quark_Pt                = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_Wqq_Quark_Pt"           , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_Wqq_AntiQuark_Pt            = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_Wqq_AntiQuark_Pt"       , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
@@ -453,6 +464,9 @@ void GenHToHW::book(TDirectory *dir) {
   h_leadBQuark_pt               = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_leadBQuark_pt"          , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_Wqq_Quarks_Pt               = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_Wqq_Quarks_Pt"          , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_Wln_Lepton_Pt               = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_Wln_Lepton_Pt"          , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
+  h_tbH_HPlus_DRCut_Pt          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HPlus_DRCut_Pt"     , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
+  h_tbH_HWh_WBoson_DRCut_Pt     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_WBoson_DRCut_Pt", ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
+  h_bHt_TQuark_DRCut_Pt         = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_bHt_TQuark_DRCut_Pt"    , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   //
   h_bHt_TQuark_Eta              = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_TQuark_Eta"           , ";#eta", nBinsEta, minEta, maxEta);
   h_bHt_tbW_WBoson_Eta          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "bHt_tbW_WBoson_Eta"       , ";#eta", nBinsEta, minEta, maxEta);
@@ -461,7 +475,6 @@ void GenHToHW::book(TDirectory *dir) {
   h_tbH_HWh_HBoson_Eta          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_HBoson_Eta"     , ";#eta", nBinsEta, minEta, maxEta);
   h_tbH_HWh_WBoson_Eta          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_WBoson_Eta"     , ";#eta", nBinsEta, minEta, maxEta);
   h_tbH_HWh_hDiTau_Tau_Eta      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_hDiTau_Tau_Eta" , ";#eta", nBinsEta, minEta, maxEta);
-  h_hDiTau_TauDiMu_DiMu_Eta     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_hDiTau_TauDiMu_DiMu_Eta", ";#eta", nBinsEta, minEta, maxEta);
   h_hDiTau_TauDiMu_Pion_Eta     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_hDiTau_TauDiMu_Pion_Eta", ";#eta", nBinsEta, minEta, maxEta);
   h_Wqq_Quark_Eta               = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_Wqq_Quark_Eta"          , ";#eta", nBinsEta, minEta, maxEta);
   h_Wqq_AntiQuark_Eta           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_Wqq_AntiQuark_Eta"      , ";#eta", nBinsEta, minEta, maxEta);
@@ -477,7 +490,6 @@ void GenHToHW::book(TDirectory *dir) {
   h_tbH_HWh_HBoson_Rap          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_HBoson_Rap"     , ";#omega", nBinsRap, minRap, maxRap);  
   h_tbH_HWh_WBoson_Rap          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_WBoson_Rap"     , ";#omega", nBinsRap, minRap, maxRap);	
   h_tbH_HWh_hDiTau_Tau_Rap      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_hDiTau_Tau_Rap" , ";#omega", nBinsRap, minRap, maxRap);
-  h_hDiTau_TauDiMu_DiMu_Rap     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_hDiTau_TauDiMu_DiMu_Rap", ";#omega", nBinsRap, minRap, maxRap);
   h_hDiTau_TauDiMu_Pion_Rap     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_hDiTau_TauDiMu_Pion_Rap", ";#omega", nBinsRap, minRap, maxRap);
   h_Wqq_Quark_Rap               = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_Wqq_Quark_Rap"          , ";#omega", nBinsRap, minRap, maxRap);
   h_Wqq_AntiQuark_Rap           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_Wqq_AntiQuark_Rap"      , ";#omega", nBinsRap, minRap, maxRap);
@@ -533,11 +545,12 @@ void GenHToHW::book(TDirectory *dir) {
   h_tbH_BQuark_MET_dPhi         = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_BQuark_MET_dPhi"       , ";#Delta#phi"        , nBinsdPhi, mindPhi, maxdPhi);
   h_twb_BQuark_MET_dPhi         = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_twb_BQuark_MET_dPhi"       , ";#Delta#phi"        , nBinsdPhi, mindPhi, maxdPhi);
   h_Wqq_leadQuark_tbqq_Quark_dPhi = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_Wqq_leadQuark_tbqq_Quark_dPhi", ";#Delta#phi"   , nBinsdPhi, mindPhi, maxdPhi);
-  h_HWh_WBoson_neut_HWh_HBoson_neut_Dphi = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_HWh_WBoson_neut_HWh_HBoson_neut_Dphi" , ";#Delta#phi" , nBinsdPhi, mindPhi, maxdPhi);
-  h_HWh_HBoson_neut_Met_dPhi    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_HWh_HBoson_neut_Met_dPhi"       , ";#Delta#phi"   , nBinsdPhi, mindPhi, maxdPhi);
-  h_HWh_DiTau_TauNeut_dPhi      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_HWh_DiTau_TauNeut_dPhi"       , ";#Delta#phi"     , nBinsdPhi, mindPhi, maxdPhi);
-  h_HWh_hDiTau_Tau_Tau_dPhi     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_HWh_hDiTau_Tau_Tau_dPhi"       , ";#Delta#phi"    , nBinsdPhi, mindPhi, maxdPhi);
-  h_HWh_Wmuon_Muon_HWh_h_Tau_dPhi = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_HWh_Wmuon_Muon_HWh_h_Tau_dPhi" , ";#Delta#phi"    , nBinsdPhi, mindPhi, maxdPhi);
+  h_HWh_WBoson_neut_HWh_HBoson_neut_dPhi = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_HWh_WBoson_neut_HWh_HBoson_neut_dPhi" , ";#Delta#phi" , nBinsdPhi, mindPhi, maxdPhi);
+  h_HWh_DiTau_TauNeut_dPhi      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_HWh_DiTau_TauNeut_dPhi"    , ";#Delta#phi"        , nBinsdPhi, mindPhi, maxdPhi);
+  h_HWh_hDiTau_Tau_Tau_dPhi     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_HWh_hDiTau_Tau_Tau_dPhi"   , ";#Delta#phi"        , nBinsdPhi, mindPhi, maxdPhi);
+  h_HWh_Wmuon_Muon_HWh_h_Tau_dPhi = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_HWh_Wmuon_Muon_HWh_h_Tau_dPhi" , ";#Delta#phi"  , nBinsdPhi, mindPhi, maxdPhi);
+  h_HWh_hDiTauNeut_DiTau_dPhi   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_HWh_hDiTauNeut_DiTau_dPhi" , ";#Delta#phi"        , nBinsdPhi, mindPhi, maxdPhi);
+  h_HWh_WBoson_neut_HWh_WBoson_muon_dPhi = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_HWh_WBoson_neut_HWh_WBoson_muon_dPhi" , ";#Delta#phi" , nBinsdPhi, mindPhi, maxdPhi);
   //
   h_tbH_HWh_WBoson_HBoson_dEta  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HWh_WBoson_HBoson_dEta" , ";#Delta#eta"       , nBinsdEta, mindEta, maxdEta);
   h_tbH_HPlus_top_dEta          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HPlus_top_dEta"         , ";#Delta#eta"       , nBinsdEta, mindEta, maxdEta);
@@ -560,9 +573,11 @@ void GenHToHW::book(TDirectory *dir) {
     //
   h_tbH_WBoson_HWh_HBoson_dRap  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_WBoson_HWh_HBoson_dRap" , ";#Delta#omega"     , nBinsdRap, mindRap, maxdRap);
   //
-  h_muonPtTauVsPt               = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_muonPtTauVsPt" , ";p_{T}^{#tau} (GeV/c)" , nBinsToOne, minToOne, maxToOne);
   h_MET_Pt                      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_MET_Pt"                     , ";p_{T} (GeV/c)"    , nBinsPt, minPt, maxPt);
   h_MET_Et                      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_MET_Et"                     , ";E_{T} (GeV/c)"    , nBinsPt, minPt, maxPt);
+  h_MET_from_HWh_h_Et           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_MET_from_HWh_h_Et"          , ";E_{T} (GeV/c)"    , nBinsPt, minPt, maxPt);
+  h_MET_from_HWh_W_Et           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_MET_from_HWh_W_Et"          , ";E_{T} (GeV/c)"    , nBinsPt, minPt, maxPt);
+  h_MET_from_tbH_H_Et           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_MET_from_tbH_H_Et"          , ";E_{T} (GeV/c)"    , nBinsPt, minPt, maxPt);
   //
   h_tbH_HPlus_Charge            = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_tbH_HPlus_Charge", ""                             , nBinsCha, minCha, maxCha);          
   //
@@ -604,24 +619,31 @@ void GenHToHW::book(TDirectory *dir) {
   h_tbH_BQuark_tbqq_subleadQuark_dR_Vs_Pt = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "h_tbH_BQuark_tbqq_subleadQuark_dR_Vs_Pt", ";#DeltaR;p_{T} (GeV/c)", nBinsdR, mindR, maxdR, nBinsPt, minPt, maxPt);
   h_HWh_hDiTau_Tau_Tau_dR_Vs_Pt        = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "h_HWh_hDiTau_Tau_Tau_dR_Vs_Pt", ";#DeltaR;p_{T} (GeV/c)", nBinsdR, mindR, maxdR, nBinsPt, minPt, maxPt);
   //
+  h_HWh_HBoson_HWh_WBoson_Pt_Vs_Pt     = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "h_HWh_HBoson_HWh_WBoson_Pt_Vs_Pt", ";p_{T} (GeV/c);p_{T} (GeV/c)", nBinsPt, minPt, maxPt, nBinsPt, minPt, maxPt);
+  //
   h_bHt_TQuark_HWh_HBoson_dPhi_Vs_Pt   = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "h_bHt_TQuark_HWh_HBoson_dPhi_Vs_Pt", ";#Delta#phi;p_{T} (GeV/c)", nBinsdPhi, mindPhi, maxdPhi, nBinsPt, minPt, maxPt);
   //
   h_InitialEOverFinalE                 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_InitialEOverFinalE" , ";E_{i}/E_{f}" , nBinsToOne, minToOne, maxToOne);
   //
-  h_mT_ChargeHiggs_M                  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggs_M"             , ";M_{T} (GeV)" , 200, minM, 2000.);
-  h_mT_ChargeHiggsMeTTau_M            = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggsMeTTau_M"       , ";M_{T} (GeV)" , 200, minM, 2000.);
-  h_mT_ChargeHiggsMeTTau_Cut1_M       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggsMeTTau_Cut1_M"  , ";M_{T} (GeV)" , 200, minM, 2000.);
-  h_mT_ChargeHiggsMeTTau_Cut2_M       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggsMeTTau_Cut2_M"  , ";M_{T} (GeV)" , 200, minM, 2000.);
-  h_mT_ChargeHiggs_assW_hadr_M        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggs_assW_hadr_M"   , ";M_{T} (GeV)" , 200, minM, 2000.);
-  h_mT_ChargeHiggs_assW_lept_M        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggs_assW_lept_M"   , ";M_{T} (GeV)" , 200, minM, 2000.);
-  h_mT_ChargeHiggs_assMuon_M          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggs_assMuon_M"     , ";M_{T} (GeV)" , 200, minM, 2000.);
-  h_mT_ChargeHiggs_assqq_M            = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggs_assqq_M"       , ";M_{T} (GeV)" , 200, minM, 2000.);
-  h_mT_ChargeHiggs_taudPhils_M        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggs_taudPhils_M"   , ";M_{T} (GeV)" , 200, minM, 2000.);
-  h_mT_ChargeHiggs_taudPhigr_M        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggs_taudPhigr_M"   , ";M_{T} (GeV)" , 200, minM, 2000.);
-  h_mT_ChargeHiggs_OneAnyMuon_M       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggs_OneAnyMuon_M"  , ";M_{T} (GeV)" , 200, minM, 2000.);
-  h_mT_ChargeHiggs_hptMuon_M          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggs_hptMuon_M"     , ";M_{T} (GeV)" , 200, minM, 2000.);
+  h_mT_ChargeHiggs_MT                  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggs_MT"             , ";M_{T} (GeV)" , 200, minM, 2000.);
+  h_mT_ChargeHiggsMeTfromH_MT          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggsMeTfromH_MT"     , ";M_{T} (GeV)" , 200, minM, 2000.);
+  h_mT_ChargeHiggsMeTTau_Cut1_MT       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggsMeTTau_Cut1_MT"  , ";M_{T} (GeV)" , 200, minM, 2000.);
+  h_mT_ChargeHiggsMeTTau_Cut2_MT       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggsMeTTau_Cut2_MT"  , ";M_{T} (GeV)" , 200, minM, 2000.);
+  h_mT_ChargeHiggs_assW_hadr_MT        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggs_assW_hadr_MT"   , ";M_{T} (GeV)" , 200, minM, 2000.);
+  h_mT_ChargeHiggs_assW_lept_MT        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggs_assW_lept_MT"   , ";M_{T} (GeV)" , 200, minM, 2000.);
+  h_mT_ChargeHiggs_assMuon_MT          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggs_assMuon_MT"     , ";M_{T} (GeV)" , 200, minM, 2000.);
+  h_mT_ChargeHiggs_assqq_MT            = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggs_assqq_MT"       , ";M_{T} (GeV)" , 200, minM, 2000.);
+  h_mT_ChargeHiggs_taudPhils_MT        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggs_taudPhils_MT"   , ";M_{T} (GeV)" , 200, minM, 2000.);
+  h_mT_ChargeHiggs_taudPhigr_MT        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggs_taudPhigr_MT"   , ";M_{T} (GeV)" , 200, minM, 2000.);
+  h_mT_ChargeHiggs_OneAnyMuon_MT       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggs_OneAnyMuon_MT"  , ";M_{T} (GeV)" , 200, minM, 2000.);
+  h_mT_ChargeHiggs_hptMuon_MT          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_ChargeHiggs_hptMuon_MT"     , ";M_{T} (GeV)" , 200, minM, 2000.);
+  h_mT_HWh_W_MT                        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_HWh_W_MT"                   , ";M_{T} (GeV)" , 150, minM, 1500.);
+  h_mT_HWh_met_tau_W_MT                = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_HWh_met_tau_W_MT"           , ";M_{T} (GeV)" , 150, minM, 1500.);
+  h_mT_HWh_WCor_MT                     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_mT_HWh_WCor_MT"                , ";M_{T} (GeV)" , 300, minM, 1500.);
   //
-  h_HWh_HBoson_neut_Met_dPhi_Vs_HWh_WBoson_neut_HWh_HBoson_neut_dPhi = fHistoWrapper.makeTH<TH2F>(HistoLevel::kVital, th2, "h_HWh_HBoson_neut_Met_dPhi_Vs_HWh_WBoson_neut_HWh_HBoson_neut_dPhi", ";#Delta#phi_{#nu_{#mu}-#nu_{#tau}};#Delta#phi_{MeT-#nu_{#tau}}", nBinsdPhi, mindPhi, maxdPhi,nBinsdPhi, mindPhi, maxdPhi);
+  h_HWh_h_tau_M                        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_HWh_h_tau_M"                   , "M (GeV)"      , 100,   minM,   5);
+  h_HWh_h_M                            = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_HWh_h_M"                       , "M (GeV)"      , 100, minM, 500); 
+  h_HWh_W_muon_M                       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_HWh_W_muon_M"                  , "M (GeV)"      , 100, minM, 0.5);
   //
   h_leadquarknumber                    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_leadquarknumber"  ,  ";LeadQuark" , 6, -0.5, 5.5);
   h_subleadquarknumber                 = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_subleadquarknumber"  ,  ";SubLeadQuark" , 6, -0.5, 5.5);
@@ -818,6 +840,7 @@ void GenHToHW::process(Long64_t entry) {
   math::XYZTLorentzVector HWh_HBoson_p4;
   math::XYZTLorentzVector HWh_WBoson_p4;
   math::XYZTLorentzVector HWh_hDiTau_p4;
+  math::XYVector HWh_hDiTau_p2;
   math::XYZTLorentzVector bHt_TQuark_p4;
   math::XYZTLorentzVector bHt_tbW_WBoson_p4;
   math::XYZTLorentzVector bHt_tbW_BQuark_p4;
@@ -846,7 +869,7 @@ void GenHToHW::process(Long64_t entry) {
   std::vector<math::XYZTLorentzVector> v_neutrino_p4;
   math::XYZTLorentzVector assoBQuark_p4;
   std::vector<math::XYZTLorentzVector> v_assoBQuark_p4;
-  //math::XYZTLorentzVector visibleTau_p4;
+  math::XYZTLorentzVector visibleTau_p4;
   std::vector<math::XYZTLorentzVector> v_visibleTau_p4;
   std::vector<math::XYVector> v_visibleTau_p2;
   math::XYVector visibleTau_p2;
@@ -857,11 +880,13 @@ void GenHToHW::process(Long64_t entry) {
   std::vector<math::XYZTLorentzVector>  v_twb_topproducts;
   math::XYZTLorentzVector neut_from_W_p4;
   math::XYZTLorentzVector neut_from_tau_p4;
+  math::XYVector neut_from_tau_p2;
   std::vector<math::XYZTLorentzVector> v_neut_from_tau_p4;
   std::vector<genParticle> g_ditau_htt;
   std::vector<genParticle> g_Wmuon;
   std::vector<genParticle> g_assWmuon;
   std::vector<genParticle> g_neut_from_tau;
+  std::vector<genParticle> g_neut_from_W;
   std::vector<genParticle> g_assWQuark;
   std::vector<genParticle> g_assWAntiQuark;
   std::vector<genParticle> g_muon_p4;
@@ -1238,6 +1263,7 @@ void GenHToHW::process(Long64_t entry) {
 		if (mcTools.IsNeutrino(dId)) 
 		  {
 		    neut_from_W_p4 = d.p4();
+		    g_neut_from_W.push_back(d);
 		    if (0) std::cout << "neut from W" << std::endl;
 		  }
 	      }//for (auto& d: genP_daughters)                                                                                                                                                             
@@ -1245,7 +1271,7 @@ void GenHToHW::process(Long64_t entry) {
       }
 	
 
-    math::XYZTLorentzVector visibleTau_p4;
+    // math::XYZTLorentzVector visibleTau_p4;
     if ( abs(genP_pdgId) == 15)
       {
 	if (!bIsLastCopy) continue;
@@ -1287,6 +1313,7 @@ void GenHToHW::process(Long64_t entry) {
 		  {
 		    if (0) std::cout <<"neut from tau" << std::endl;
 		    neut_from_tau_p4 = d.p4();
+		    neut_from_tau_p2 = d.p2();
 		    v_neut_from_tau_p4.push_back(neut_from_tau_p4);
 		    g_neut_from_tau.push_back(d);
 		  }
@@ -1295,8 +1322,9 @@ void GenHToHW::process(Long64_t entry) {
 		    if (0) std::cout <<"tau d id= " << d.pdgId() <<  std::endl;
 		    tauvish_p4 = d.p4();
 		    tauvish_p2 = d.p2();
-		    visibleTau_p2 += tauvish_p2; 
-		    visibleTau_p4 += tauvish_p4;
+		    //visibleTau_p2 += tauvish_p2; 
+		    //visibleTau_p4 = visibleTau_p4 + d.p4();
+		    //visibleTau_p4 += tauvish_p4;
 		  }
 	      }
 	    if (hadrtau)
@@ -1304,6 +1332,9 @@ void GenHToHW::process(Long64_t entry) {
 	      {
 		if (0) std::cout << "hadrtau " << hadrtau << std::endl;
 		HWh_hDiTau_p4 = p.p4();
+		HWh_hDiTau_p2 = p.p2();
+		visibleTau_p2 = HWh_hDiTau_p2 - neut_from_tau_p2;
+		visibleTau_p4 = HWh_hDiTau_p4 - neut_from_tau_p4;
 		v_ditau_htt_p4.push_back(HWh_hDiTau_p4);
 		g_ditau_htt.push_back(p);
 		v_visibleTau_p4.push_back(visibleTau_p4);
@@ -1405,13 +1436,6 @@ void GenHToHW::process(Long64_t entry) {
   } //if (v_ditau_htt_p4.size() > 1 )
   
  
-  if (v_muonPtVsTauPt.size() > 0)
-    {
-      for (size_t i=0; i < v_muonPtVsTauPt.size(); i++)
-	{
-	  h_muonPtTauVsPt -> Fill(v_muonPtVsTauPt.at(i));
-	}
-    }
   math::XYZTLorentzVector InEnergy;
   math::XYZTLorentzVector FiEnergy;
   FiEnergy = Htb_HPlus_p4 + bHt_tbW_BQuark_p4 + assoBQuark_p4;
@@ -1506,18 +1530,10 @@ void GenHToHW::process(Long64_t entry) {
   h_tbH_HWh_WBoson_Pt  -> Fill(HWh_WBoson_p4.pt());
   h_tbH_HWh_WBoson_Eta -> Fill(HWh_WBoson_p4.eta());
   h_tbH_HWh_WBoson_Rap -> Fill( mcTools.GetRapidity(HWh_WBoson_p4) );
-  
-  // H0-> DiTau -> DiMu
-  if (v_dimu_htt_p4.size() > 0 ) 
-    {
-      for (size_t i=0; i < v_dimu_htt_p4.size(); i++)
-	{
-	  h_hDiTau_TauDiMu_DiMu_Pt  -> Fill(v_dimu_htt_p4.at(i).pt());
-	  h_hDiTau_TauDiMu_DiMu_Eta -> Fill(v_dimu_htt_p4.at(i).eta());
-	  h_hDiTau_TauDiMu_DiMu_Rap -> Fill( mcTools.GetRapidity(v_dimu_htt_p4.at(i)) );
-	  
-	}
-    }
+  // H-boson Pt Vs W-boson Pt
+  h_HWh_HBoson_HWh_WBoson_Pt_Vs_Pt -> Fill(HWh_HBoson_p4.pt() , HWh_WBoson_p4.pt());
+
+
   // H0-> DiTau -> Pion
   if (v_pion_htt_p4.size() > 0 )
     {  
@@ -1636,41 +1652,52 @@ void GenHToHW::process(Long64_t entry) {
         }
     }
   
+  math::XYZTLorentzVector divistau_p4;
+  if (v_visibleTau_p4.size() > 0 )
+    {
+      if (v_HWh_Wmuon_Muon_p4.size() > 0 )
+        {
+          for (size_t i=0; i < v_visibleTau_p4.size(); i++)
+            {
+	      h_HWh_h_tau_M -> Fill(v_visibleTau_p4.at(i).M());
+              divistau_p4 += v_visibleTau_p4.at(i);
+              double HWh_Wmuon_Muon_HWh_h_Tau_dR = ROOT::Math::VectorUtil::DeltaR(Wmuon_p4 , v_visibleTau_p4.at(i));
+              h_HWh_Wmuon_Muon_HWh_h_Tau_dR -> Fill(HWh_Wmuon_Muon_HWh_h_Tau_dR);
+	      if (0) std::cout << "v_visibleTau_p4.at(i).M() = " << " " << v_visibleTau_p4.at(i).M() <<  std::endl;
+	    }
+          double HWh_Wmuon_Muon_HWh_h_Tau_dPhi = std::abs(ROOT::Math::VectorUtil::DeltaPhi(divistau_p4, Wmuon_p4 ));
+          h_HWh_Wmuon_Muon_HWh_h_Tau_dPhi -> Fill(HWh_Wmuon_Muon_HWh_h_Tau_dPhi);
+	  h_HWh_h_M -> Fill(divistau_p4.M());
+	  if (0) std::cout << "divistau_p4.M()= " << " " << divistau_p4.M() <<  std::endl;
+	  h_HWh_W_muon_M -> Fill(Wmuon_p4.M());
+        }
+    }
 
   double dphineu = 2323.0;
   math::XYZTLorentzVector DiNeur_from_tau_p4;
+  math::XYZTLorentzVector met_from_H_p4;
   if (v_neut_from_tau_p4.size() > 0)
     {
       for (size_t i=0; i < v_neut_from_tau_p4.size(); i++)
         {
           DiNeur_from_tau_p4 += v_neut_from_tau_p4.at(i);
-        }
+	}
+      h_MET_from_HWh_h_Et -> Fill(DiNeur_from_tau_p4.pt());
+      double HWh_hDiTauNeut_DiTau_dPhi = std::abs(ROOT::Math::VectorUtil::DeltaPhi(DiNeur_from_tau_p4, divistau_p4));
+      h_HWh_hDiTauNeut_DiTau_dPhi -> Fill(HWh_hDiTauNeut_DiTau_dPhi);
       if (v_HWh_Wmuon_Muon_p4.size() > 0 )
         {
+	  double HWh_WBoson_neut_HWh_WBoson_muon_dPhi = std::abs(ROOT::Math::VectorUtil::DeltaPhi(neut_from_W_p4 , Wmuon_p4));
+	  h_HWh_WBoson_neut_HWh_WBoson_muon_dPhi -> Fill(HWh_WBoson_neut_HWh_WBoson_muon_dPhi);
+	  h_MET_from_HWh_W_Et -> Fill(neut_from_W_p4.pt());
+	  met_from_H_p4 = neut_from_W_p4 + DiNeur_from_tau_p4;
+	  h_MET_from_tbH_H_Et -> Fill(met_from_H_p4.pt());
           double HWh_WBoson_neut_HWh_HBoson_neut_Dphi = std::abs(ROOT::Math::VectorUtil::DeltaPhi(DiNeur_from_tau_p4 , neut_from_W_p4));
-          double HWh_HBoson_neut_Met_dPhi = std::abs(ROOT::Math::VectorUtil::DeltaPhi(DiNeur_from_tau_p4 , Met_p4));
-	  dphineu = HWh_WBoson_neut_HWh_HBoson_neut_Dphi;
-	  h_HWh_WBoson_neut_HWh_HBoson_neut_Dphi -> Fill(HWh_WBoson_neut_HWh_HBoson_neut_Dphi);
-          h_HWh_HBoson_neut_Met_dPhi -> Fill(HWh_HBoson_neut_Met_dPhi);
-          h_HWh_HBoson_neut_Met_dPhi_Vs_HWh_WBoson_neut_HWh_HBoson_neut_dPhi -> Fill(HWh_WBoson_neut_HWh_HBoson_neut_Dphi , HWh_HBoson_neut_Met_dPhi);
-        }
+          dphineu = HWh_WBoson_neut_HWh_HBoson_neut_Dphi;
+	  h_HWh_WBoson_neut_HWh_HBoson_neut_dPhi -> Fill(HWh_WBoson_neut_HWh_HBoson_neut_Dphi);
+         }
     }
 
-  math::XYZTLorentzVector divistau_p4;
-  if (v_visibleTau_p4.size() > 0 )
-    {
-      if (v_HWh_Wmuon_Muon_p4.size() > 0 )
-	{
-	  for (size_t i=0; i < v_visibleTau_p4.size(); i++)
-	    {
-	      divistau_p4 += v_visibleTau_p4.at(i);
-	      double HWh_Wmuon_Muon_HWh_h_Tau_dR = ROOT::Math::VectorUtil::DeltaR(Wmuon_p4 , v_visibleTau_p4.at(i));
-	      h_HWh_Wmuon_Muon_HWh_h_Tau_dR -> Fill(HWh_Wmuon_Muon_HWh_h_Tau_dR);
-	    }
-	  double HWh_Wmuon_Muon_HWh_h_Tau_dPhi = std::abs(ROOT::Math::VectorUtil::DeltaPhi(divistau_p4, Wmuon_p4 ));
-	  h_HWh_Wmuon_Muon_HWh_h_Tau_dPhi -> Fill(HWh_Wmuon_Muon_HWh_h_Tau_dPhi);
-	}
-    }
   double taudPhi = 0.;
   if (v_visibleTau_p4.size() > 1)
     {  
@@ -1681,6 +1708,14 @@ void GenHToHW::process(Long64_t entry) {
 	      double HWh_hDiTau_Tau_Tau_dR = ROOT::Math::VectorUtil::DeltaR(v_visibleTau_p4.at(i), v_visibleTau_p4.at(j));
 	      double HWh_hDiTau_Tau_Tau_dPhi = std::abs(ROOT::Math::VectorUtil::DeltaPhi(v_visibleTau_p4.at(i), v_visibleTau_p4.at(j)));
 	      taudPhi = HWh_hDiTau_Tau_Tau_dPhi;
+	      //chris 
+	      if (HWh_hDiTau_Tau_Tau_dR <= 0.8 )
+		{
+		  cHPlusDRCut.increment();
+		  h_tbH_HPlus_DRCut_Pt ->Fill( Htb_HPlus_p4.pt());
+		  h_tbH_HWh_WBoson_DRCut_Pt  -> Fill(HWh_WBoson_p4.pt());
+		  h_bHt_TQuark_DRCut_Pt ->Fill( bHt_TQuark_p4.pt()  );
+		}
 	      h_HWh_hDiTau_Tau_Tau_dR -> Fill(HWh_hDiTau_Tau_Tau_dR);
 	      h_HWh_hDiTau_Tau_Tau_dPhi -> Fill(HWh_hDiTau_Tau_Tau_dPhi);
 	      if (v_visibleTau_p4.at(i).pt() > v_visibleTau_p4.at(j).pt())
@@ -1706,7 +1741,9 @@ void GenHToHW::process(Long64_t entry) {
 	}
     }
   
+
   
+
   //Transverse Mass of Charge Higgs
   
   // Definitions
@@ -1719,33 +1756,41 @@ void GenHToHW::process(Long64_t entry) {
 	  const math::XYVector muon  = g_Wmuon.at(0).p2();
 	  //Transverse Mass
 	  double mT_genP = GetMt(v_visibleTau_p2.at(0), v_visibleTau_p2.at(1), muon, met);
-	  h_mT_ChargeHiggs_M -> Fill(mT_genP);
+	  //double mT_genP_W = GetWMt(muon, met);
+	  double mT_genP_W = GetWMt2(Wmuon_p4, Met_p4);
+	  double mT_genP_W_co = GetWMt2(Wmuon_p4, neut_from_W_p4);
+	  h_mT_HWh_W_MT -> Fill(mT_genP_W);
+	  h_mT_HWh_WCor_MT -> Fill(mT_genP_W_co);
+	  h_mT_ChargeHiggs_MT -> Fill(mT_genP);
 	  if (taudPhi < 2.5 ) {
-	    h_mT_ChargeHiggs_taudPhils_M -> Fill(mT_genP);
+	    h_mT_ChargeHiggs_taudPhils_MT -> Fill(mT_genP);
 	  }
 	  if (taudPhi > 2. ) {
-            h_mT_ChargeHiggs_taudPhigr_M -> Fill(mT_genP);
+            h_mT_ChargeHiggs_taudPhigr_MT -> Fill(mT_genP);
           }
 	  if (assWHadr)
 	    {
-	      h_mT_ChargeHiggs_assW_hadr_M -> Fill(mT_genP);
+	      h_mT_ChargeHiggs_assW_hadr_MT -> Fill(mT_genP);
 	    }
 	  else
 	    {
-	      h_mT_ChargeHiggs_assW_lept_M -> Fill(mT_genP);
+	      h_mT_ChargeHiggs_assW_lept_MT -> Fill(mT_genP);
 	    }
+	  
 	  if (g_neut_from_tau.size() > 1)
 	    {
 	      const math::XYVector metfromtau = g_neut_from_tau.at(0).p2() + g_neut_from_tau.at(1).p2();
+	      double mT_genP_W_neut_tau = GetWMt2(Wmuon_p4, DiNeur_from_tau_p4);
 	      double mT_CHoTauMet = GetMt(v_visibleTau_p2.at(0), v_visibleTau_p2.at(1), muon, metfromtau);
-	      h_mT_ChargeHiggsMeTTau_M -> Fill(mT_CHoTauMet);
+	      h_mT_ChargeHiggsMeTfromH_MT -> Fill(mT_CHoTauMet);
+	      h_mT_HWh_met_tau_W_MT -> Fill(mT_genP_W_neut_tau);
 	      if (dphineu < 1.047)
 		{
-		  h_mT_ChargeHiggsMeTTau_Cut1_M -> Fill(mT_CHoTauMet);
+		  h_mT_ChargeHiggsMeTTau_Cut1_MT -> Fill(mT_CHoTauMet);
 		}
 	      else
 		{
-		  h_mT_ChargeHiggsMeTTau_Cut2_M -> Fill(mT_CHoTauMet);
+		  h_mT_ChargeHiggsMeTTau_Cut2_MT -> Fill(mT_CHoTauMet);
 		}
 	    }
 	  if (g_assWQuark.size() > 0)
@@ -1753,36 +1798,38 @@ void GenHToHW::process(Long64_t entry) {
 	      const math::XYVector assq = g_assWQuark.at(0).p2();
 	      const math::XYVector assaq = g_assWAntiQuark.at(0).p2();
 	      double mT_assqq = GetMt(assq, assaq, muon, met);
-	      h_mT_ChargeHiggs_assqq_M -> Fill(mT_assqq);
+	      h_mT_ChargeHiggs_assqq_MT -> Fill(mT_assqq);
 	    }
 	} //if (g_Wmuon.size() > 0)
       if (g_muon_p4.size() == 1)
 	{
 	  const math::XYVector muonany = g_muon_p4.at(0).p2();
 	  double mT_genPanymuon = GetMt(v_visibleTau_p2.at(0), v_visibleTau_p2.at(1), muonany, met);
-	  h_mT_ChargeHiggs_OneAnyMuon_M -> Fill(mT_genPanymuon);
+	  h_mT_ChargeHiggs_OneAnyMuon_MT -> Fill(mT_genPanymuon);
 	}
       if (g_muon_p4.size() > 1)
         {
 	  double hpt = -20.;
 	  genParticle g_hpt_muon;
 	  for (size_t i=0; i < g_muon_p4.size(); i++)
-	    {
+	    { 
 	      double mpt = g_muon_p4.at(i).pt();
+	      if (0) std::cout << "hpt= " << hpt << " mpt= " << mpt << std::endl;
 	      if (mpt > hpt)
 		{
 		  g_hpt_muon = g_muon_p4.at(i);
+		  hpt = mpt;
 		}
 	    }
 	  const math::XYVector muonhpt = g_hpt_muon.p2();
 	  double mT_genPanymuon = GetMt(v_visibleTau_p2.at(0), v_visibleTau_p2.at(1), muonhpt, met);
-	  h_mT_ChargeHiggs_hptMuon_M -> Fill(mT_genPanymuon);
+	  h_mT_ChargeHiggs_hptMuon_MT -> Fill(mT_genPanymuon);
 	}
       if (g_assWmuon.size() > 0)
 	{
 	  const math::XYVector assmuon = g_assWmuon.at(0).p2();
 	  double mT_assWgenP = GetMt(v_visibleTau_p2.at(0), v_visibleTau_p2.at(1), assmuon, met);
-	  h_mT_ChargeHiggs_assMuon_M -> Fill(mT_assWgenP);
+	  h_mT_ChargeHiggs_assMuon_MT -> Fill(mT_assWgenP);
 	}
     }
   
@@ -2019,6 +2066,37 @@ void GenHToHW::process(Long64_t entry) {
 
   return;
 }
+
+
+
+//calculation of W transverse mass
+double GenHToHW::GetWMt(const math::XYVector muon, const math::XYVector& met){
+  double metEt  = met.R();
+  double muonEt = muon.r();
+  double mT     = -999.9;
+  double mTSq   =   0.0;
+  double EtSq   = (metEt + muonEt) * (metEt + muonEt);
+  double EtXSq  = (muon.x() + met.x()) * (muon.x() + met.x());
+  double EtYSq  = (muon.y() + met.y()) * (muon.y() + met.y());
+  mTSq = EtSq - (EtXSq + EtYSq);
+  if (mTSq >= 0) mT = std::sqrt(mTSq);
+  return mT;
+}
+
+
+//calculation of W transverse mass second approach
+double GenHToHW::GetWMt2(const math::XYZTLorentzVector muon, const math::XYZTLorentzVector neut){
+  double muonPt = muon.pt();
+  double neutPt = neut.pt();
+  double dPhi   = std::abs(ROOT::Math::VectorUtil::DeltaPhi(muon, neut));
+  double mT     = -999.9;
+  double mTSq   = 0.0;
+  mTSq          = 2. * muonPt * neutPt * (1. - std::cos(dPhi));
+  if (mTSq >= 0) mT = std::sqrt(mTSq);
+  return mT;
+}
+
+
 
 double GenHToHW::GetMt(const math::XYVector tau1, const math::XYVector tau2, const math::XYVector muon, const math::XYVector& met) {
   // Use scalar sums to get the transverse mass

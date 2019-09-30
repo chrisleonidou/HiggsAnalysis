@@ -42,6 +42,7 @@ public:
   virtual double GetMt(const math::XYVector tau1, const math::XYVector tau2, const math::XYVector muon, const math::XYVector& met);
   virtual double GetWMt(const math::XYVector muon, const math::XYVector& met);
   virtual double GetWMt2(const math::XYZTLorentzVector muon, const math::XYZTLorentzVector neut);
+  const genParticle GetLastCopy(const vector<genParticle> genParticles, const genParticle &p);
 private:
 
   // Input parameters
@@ -289,10 +290,10 @@ void RecGenHToHW::book(TDirectory *dir) {
   h_GenuineTop_Bjet_Pt        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Bjet_Pt"       , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_GenuineTop_Dijet_Pt       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Dijet_Pt"      , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_GenuineTop_Trijet_Pt      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Trijet_Pt"     , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
-  h_GenuineTop_Dijet_dR       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Dijet_dR"      , ";#DeltaR"      , nBinsdR, mindR, maxdR);
-  h_GenuineTop_ldgJet_Bjet_dR = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_ldgJet_Bjet_dR", ";#DeltaR"      , nBinsdR, mindR, maxdR);
-  h_GenuineTop_subJet_Bjet_dR = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_subJet_Bjet_dR", ";#DeltaR"      , nBinsdR, mindR, maxdR);
-  h_GenuineTop_Dijet_Bjet_dR  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Dijet_Bjet_dR" , ";#DeltaR"      , nBinsdR, mindR, maxdR);
+  h_GenuineTop_Dijet_dR       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Dijet_dR"      , ";#DeltaR"      , 50, mindR, maxdR);
+  h_GenuineTop_ldgJet_Bjet_dR = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_ldgJet_Bjet_dR", ";#DeltaR"      , 50, mindR, maxdR);
+  h_GenuineTop_subJet_Bjet_dR = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_subJet_Bjet_dR", ";#DeltaR"      , 50, mindR, maxdR);
+  h_GenuineTop_Dijet_Bjet_dR  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Dijet_Bjet_dR" , ";#DeltaR"      , 50, mindR, maxdR);
   h_GenuineTop_Dijet_M        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Dijet_M"       , ";M (GeV/c^{2})", 100    , minM , 200.);
   h_GenuineTop_Trijet_M       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Trijet_M"      , ";M (GeV/c^{2})", 100    , minM , 500.);
 
@@ -541,7 +542,8 @@ void RecGenHToHW::process(Long64_t entry) {
   math::XYZTLorentzVector htau2_p4;
   std::vector<math::XYZTLorentzVector> v_bHt_HWh_h_vistau_p4;
   std::vector<math::XYZTLorentzVector> v_bHt_tWb_Wqq_p4;
-  
+  std::vector<math::XYZTLorentzVector> v_bHt_TQuark_p4;
+  std::vector<math::XYZTLorentzVector> v_bHt_tbW_BQuark_p4;
   //bool assWHadr = false;
   // Define the table                                                                                                                                                                                     
   Table table("Evt | Index | PdgId | Status | Charge | Pt | Eta | Phi | E | Vertex (mm) | D0 (mm) | Lxy (mm) | Mom | Daughters", "Text"); //LaTeX or Text
@@ -697,11 +699,13 @@ void RecGenHToHW::process(Long64_t entry) {
       {
         if (!bIsLastCopy) continue;
 	bHt_TQuark_p4 = p.p4();
+	v_bHt_TQuark_p4.push_back(bHt_TQuark_p4);
 	for (auto& d: genP_daughters)
 	  {
 	    if ( abs(d.pdgId()) == 5)
 	      {
 		bHt_tbW_BQuark_p4 = d.p4();
+		v_bHt_tbW_BQuark_p4.push_back(bHt_TQuark_p4);
 	      }
 	  }
       }
@@ -772,6 +776,79 @@ void RecGenHToHW::process(Long64_t entry) {
   //h_eventcount -> Fill(allevent);
   if ( bSkipEvent ) return;  
   
+  std::vector<genParticle> GenTops;
+  std::vector<genParticle> GenTops_BQuark;
+  std::vector<genParticle> GenTops_SubldgQuark;
+  std::vector<genParticle> GenTops_LdgQuark;
+  genParticle  Gen_Wa;
+  GenTops = GetGenParticles(fEvent.genparticles().getGenParticles(), 6, true, false);
+  // For-loop: All top quarks                                                                                                               
+  for (auto& top: GenTops){
+
+    bool FoundBQuark = false;
+    std::vector<genParticle> quarks;
+    genParticle bquark;
+    // For-loop: Top quark daughters (Nested)                                                                                               
+    for (size_t i=0; i<top.daughters().size(); i++)
+      {
+
+        int dau_index = top.daughters().at(i);
+        genParticle dau = fEvent.genparticles().getGenParticles()[dau_index];
+
+        // B-Quark                                                                                                                          
+        if (std::abs(dau.pdgId()) ==  5)
+          {
+            bquark = dau;
+            FoundBQuark = true;
+          }
+
+        // W-Boson   
+	if (std::abs(dau.pdgId()) == 24)
+          {
+            // Get the last copy                                                                                                            
+            genParticle W = GetLastCopy(fEvent.genparticles().getGenParticles(), dau);
+	    Gen_Wa = W;
+	    
+            // For-loop: W-boson daughters                                                                                                  
+            for (size_t idau=0; idau<W.daughters().size(); idau++)
+              {
+                // Find the decay products of W-boson 
+		
+                int Wdau_index = W.daughters().at(idau);
+                genParticle Wdau = fEvent.genparticles().getGenParticles()[Wdau_index];
+
+                // Consider only quarks as decaying products                                                                                
+                if (std::abs(Wdau.pdgId()) > 5) continue;
+		
+                // Save daughter                                                                                                            
+                quarks.push_back(Wdau);
+              }//W-boson daughters		
+	    
+          }//W-boson
+      }//Top-quark daughters                                                                                                                
+
+    // Skip top if b-quark is not found (i.e. top decays to W and c)                                                                        
+    if (!FoundBQuark) continue;
+    // Skip top if it decays leptonically (the "quarks" vector will be empty causing errors)                                                
+
+    if (quarks.size() < 2) continue;
+    // Fill vectors for b-quarks, leading and subleading quarks coming from tops      
+    
+    GenTops_BQuark.push_back(bquark);
+
+    if (quarks.at(0).pt() > quarks.at(1).pt())
+      {
+        GenTops_LdgQuark.push_back(quarks.at(0));
+        GenTops_SubldgQuark.push_back(quarks.at(1));
+      }
+    else
+      {
+        GenTops_LdgQuark.push_back(quarks.at(1));
+        GenTops_SubldgQuark.push_back(quarks.at(0));
+      }
+    
+  } // For-Loop over top quarks  
+  
   if (v_bHt_HWh_h_vistau_p4.size() > 0 )
     {
       for (size_t i=0; i < v_bHt_HWh_h_vistau_p4.size()-1; i++)
@@ -823,167 +900,177 @@ void RecGenHToHW::process(Long64_t entry) {
       double bHt_tWb_Wqq_qq_dEta = std::abs(v_bHt_tWb_Wqq_p4.at(0).eta() - v_bHt_tWb_Wqq_p4.at(1).eta());
       h_bHt_tWb_Wqq_qq_dEta -> Fill(bHt_tWb_Wqq_qq_dEta);
     }
+
+  
+  
   if(0) std::cout << "=== bag1" << std::endl;
   const double twoSigmaDpt = 0.32;
   const double dRcut    = 0.4;
-  double dRmin  = 9999.9;
-  // Do matching
-  math::XYZTLorentzVector mcMatchedT_BJet(0,0,0,0), mcMatchedT_LdgJet(0,0,0,0), mcMatchedT_SubldgJet(0,0,0,0);
-  
-  if(0) std::cout << "=== bag2" << std::endl;
-  for(size_t i=0; i < selBJets_p4.size(); i++)
+  std::vector<math::XYZTLorentzVector> MGen_LdgJet, MGen_SubldgJet, MGen_Bjet;
+  vector <double> dRminB;
+  for (size_t i=0; i<GenTops.size(); i++)
     {
-      double dR = ROOT::Math::VectorUtil::DeltaR(selBJets_p4.at(i) , bHt_tbW_BQuark_p4 );
-      if(0) std::cout << "=== dR= " << dR << std::endl;
-      double dPtOverPt = std::abs((selBJets_p4.at(i).pt() - bHt_tbW_BQuark_p4.pt())/bHt_tbW_BQuark_p4.pt());
-      if (dR <= dRmin )
+      math::XYZTLorentzVector mcMatchedT_BJet;
+      math::XYZTLorentzVector BQuark;
+      BQuark = GenTops_BQuark.at(i).p4();
+      double dRmin   = 9999.9;
+      double dRminIn = 0.4;
+      // Do matching
+      if(0) std::cout << "=== bag2" << std::endl;
+      for(size_t i=0; i < selJets_p4.size(); i++)
 	{
-	  if(0) std::cout << "=== dPtOverPt = " << dPtOverPt << std::endl;
-	  if (dPtOverPt < twoSigmaDpt) 
-	    {
-	      if(0) std::cout << "=== dRmin = dR" << std::endl;
-	      dRmin = dR;
-	      mcMatchedT_BJet = selBJets_p4.at(i);
-	    }
+	  double dR = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(i) , BQuark );
+	  if (dR > dRminIn ) continue;
+	  double dPtOverPt = std::abs((selJets_p4.at(i).pt() - BQuark.pt())/BQuark.pt());
+	  if (dPtOverPt > twoSigmaDpt) continue;
+	  dRmin = dR;
+	  dRminIn = dR;
+	  mcMatchedT_BJet = selJets_p4.at(i);  
 	}
+      dRminB.push_back(dRmin);
+      MGen_LdgJet.push_back(mcMatchedT_BJet);
     }
-  //h_GenuineTop_Bjet_Pt           -> Fill(mcMatchedT_BJet.pt());
-  double dR1min, dR2min, dPtOverPt1min, dPtOverPt2min;
-  dR1min = dR2min = dPtOverPt1min = dPtOverPt2min = 99999.9;
-  if(0) std::cout << "=== bag3" << std::endl;
-  for(size_t i=0; i < selJets_p4.size(); i++)
-    {
-      // Skip the jets that are matched with bquarks
-      double dRn = 9999.9;
-      if (dRmin < dRcut && mcMatchedT_BJet.pt() > 0.)
-	{
-	  dRn = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(i) , mcMatchedT_BJet);
-	  
-	}
-      if( dRn <= 0.8) continue;
-      
-      // Find dR for the two jets in top-decay dijet
-      
-      double dR1 = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(i), GenT_LdgQuark_p4);
-      double dR2 = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(i), GenT_SubldgQuark_p4);
-      
-      // Require both jets to be within dR <= dRcut 
-      // Calculate dPtOverPt for each jet in top-decay dijet   
-      
-      double dPtOverPt1 = std::abs((selJets_p4.at(i).pt() - GenT_LdgQuark_p4.pt())/GenT_LdgQuark_p4.pt());
-      double dPtOverPt2 = std::abs((selJets_p4.at(i).pt() - GenT_SubldgQuark_p4.pt())/GenT_SubldgQuark_p4.pt());
-      if(0) std::cout << "=== bag4" << std::endl;
-      // Find which of the two is the correct match                                                                                 
-      if (dR1 < dR2)
-	{
-	  // Is Jet1 closer in eta-phi AND has smaller pT difference?                                                               
-	  if (dR1 < dR1min)
-	    {
-	      if (dPtOverPt1 < twoSigmaDpt)
-		{
-		  dR1min = dR1;
-		  dPtOverPt1min= dPtOverPt1;
-		  mcMatchedT_LdgJet = selJets_p4.at(i);
-		}
-	    }
-	  
-	  // Is Jet2 closer in eta-phi AND has smaller pT difference?                                                           
-	  //else if (dR2 <= dRcut && dR2 < dR2min)  at least two matched jets                                                       
-	  else if (dR2 < dR2min)                  //at least two matched jets                                                       
-	    {
-	      if (dPtOverPt2 < twoSigmaDpt)
-		{
-		  dR2min  = dR2;
-		  dPtOverPt2min = dPtOverPt2;
-		  mcMatchedT_SubldgJet = selJets_p4.at(i);
-		}
-	    }
-	}
-      else
-	{
-	  // Is Jet2 closer in eta-phi AND has smaller pT difference?                                                              
-	  if (dR2 < dR2min)
-	    {
-	      if (dPtOverPt2 < twoSigmaDpt)
-		{
-		  dR2min  = dR2;
-		  dPtOverPt2min = dPtOverPt2;
-		  mcMatchedT_SubldgJet = selJets_p4.at(i);
-		}
-	    }
 
-	  // Is Jet2 closer in eta-phi AND has smaller pT difference? 
-	  
-	  else if (dR1 < dR1min)                //at least two matched jets                                                         
+
+
+  //h_GenuineTop_Bjet_Pt           -> Fill(mcMatchedT_BJet.pt());
+  
+  for (size_t i=0; i<GenTops.size(); i++)
+    {
+      math::XYZTLorentzVector LdgQuark;
+      LdgQuark = GenTops_LdgQuark.at(i).p4();
+      math::XYZTLorentzVector SubldgQuark;
+      SubldgQuark = GenTops_SubldgQuark.at(i).p4();
+      math::XYZTLorentzVector mcMatchedT_BJet, mcMatchedT_LdgJet, mcMatchedT_SubldgJet;
+      double dR1min, dR2min, dPtOverPt1min, dPtOverPt2min;
+      dR1min = dR2min = dPtOverPt1min = dPtOverPt2min = 99999.9;
+
+      for(size_t i=0; i < selJets_p4.size(); i++)
+	{
+	  // Skip the jets that are matched with bquarks
+	  double dRn = 9999.9;
+	  for (size_t k=0; k<GenTops.size(); k++)
 	    {
-	      if  (dPtOverPt1 < twoSigmaDpt)
+	      if (dRminB.at(k) < dRcut)
 		{
-		  dR1min  = dR1;
-		  dPtOverPt1min = dPtOverPt1;
-		  mcMatchedT_LdgJet = selJets_p4.at(i);
+		  dRn = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(i) , mcMatchedT_BJet);
 		}
 	    }
-	}
-    }//for(auto Bjet: selectedBJets)
-  if(0) std::cout << "=== bag5" << std::endl;
-  // Check if TOP is genuine                                                                                                       
-  if (dR1min<= dRcut && dR2min <= dRcut && dRmin <= dRcut)
-    {
-      if(0) std::cout << "=== dR1min= " << dR1min << std::endl;
-      if(0) std::cout << "=== dR2min= " << dR2min << std::endl;
-      if(0) std::cout << "=== dRmin= " << dRmin << std::endl;
-    }
-  bool isGenuine = false;
-  if  (mcMatchedT_LdgJet.pt() > 0. && mcMatchedT_SubldgJet.pt() > 0. && mcMatchedT_BJet.pt() > 0. )
-    {
-      isGenuine = (dR1min<= dRcut && dR2min <= dRcut && dRmin <= dRcut);
-      bool twoJMatched = isGenuine;  //at least two matched jets two top decay products (used for plots)
-      if (!twoJMatched) twoJMatched = max(dR1min, dR2min) <= dRcut || max(dR1min, dRmin) <= dRcut || max(dR2min, dRmin) <= dRcut;
-    }
-  if(0) std::cout << "=== bag5" << std::endl;
-  h_TopQuarkPt_isGenuineTop -> Fill(isGenuine, bHt_TQuark_p4.pt());
-  if (isGenuine)
-    {
-      if(0) std::cout << "=== bag51" << std::endl;
-      math::XYZTLorentzVector ldgJet_p4;
-      math::XYZTLorentzVector subldgJet_p4;
-      math::XYZTLorentzVector Tbjet_p4, dijet_p4, trijet_p4;
-      if(0) std::cout << "=== bag511" << std::endl;
-      ldgJet_p4    = mcMatchedT_LdgJet;
-      if(0) std::cout << "=== bag512" << std::endl;
-      subldgJet_p4 = mcMatchedT_SubldgJet;
-      if(0) std::cout << "=== bag513" << std::endl;
-      Tbjet_p4 = mcMatchedT_BJet;
-      if(0) std::cout << "=== bag58" << std::endl;
-      dijet_p4  = ldgJet_p4 + subldgJet_p4;
-      trijet_p4 = ldgJet_p4 + subldgJet_p4 + Tbjet_p4;
-      if(0) std::cout << "=== bag52" << std::endl;
-      double dR_j1j2 = ROOT::Math::VectorUtil::DeltaR(ldgJet_p4, subldgJet_p4);
-      double dR_j1b  = ROOT::Math::VectorUtil::DeltaR(ldgJet_p4, Tbjet_p4);
-      double dR_j2b  = ROOT::Math::VectorUtil::DeltaR(subldgJet_p4, Tbjet_p4);
+	  if( dRn <= 0.8) continue;
       
-      // bool mergedDijet            = dR_j1j2 < 0.8 && dR_j1b > 0.8 && dR_j2b > 0.8 && max(ldgJet.bjetDiscriminator(), subldgJet.bjetDiscriminator()) < 0.5426;
+	  // Find dR for the two jets in top-decay dijet
+	  
+	  double dR1 = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(i), LdgQuark);
+	  double dR2 = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(i), SubldgQuark);
+      
+	  // Require both jets to be within dR <= dRcut 
+	  // Calculate dPtOverPt for each jet in top-decay dijet   
+	  
+	  double dPtOverPt1 = std::abs((selJets_p4.at(i).pt() - LdgQuark.pt())/LdgQuark.pt());
+	  double dPtOverPt2 = std::abs((selJets_p4.at(i).pt() - SubldgQuark.pt())/SubldgQuark.pt());
+	  // Find which of the two is the correct match                                                                                 
+	  if (dR1 < dR2)
+	    {
+	      // Is Jet1 closer in eta-phi AND has smaller pT difference?                                                               
+	      if (dR1 < dR1min)
+		{
+		  if (dPtOverPt1 < twoSigmaDpt)
+		    {
+		      dR1min = dR1;
+		      dPtOverPt1min= dPtOverPt1;
+		      mcMatchedT_LdgJet = selJets_p4.at(i);
+		    }
+		}
+	      
+	      // Is Jet2 closer in eta-phi AND has smaller pT difference?                                                           
+	      //else if (dR2 <= dRcut && dR2 < dR2min)  at least two matched jets                                                       
+	      else if (dR2 < dR2min)                  //at least two matched jets                                                       
+		{
+		  if (dPtOverPt2 < twoSigmaDpt)
+		    {
+		      dR2min  = dR2;
+		      dPtOverPt2min = dPtOverPt2;
+		      mcMatchedT_SubldgJet = selJets_p4.at(i);
+		    }
+		}
+	    }
+	  else
+	    {
+	      // Is Jet2 closer in eta-phi AND has smaller pT difference?                                                              
+	      if (dR2 < dR2min)
+		{
+		  if (dPtOverPt2 < twoSigmaDpt)
+		    {
+		      dR2min  = dR2;
+		      dPtOverPt2min = dPtOverPt2;
+		      mcMatchedT_SubldgJet = selJets_p4.at(i);
+		    }
+		}
+	      
+	      // Is Jet2 closer in eta-phi AND has smaller pT difference? 
+	      
+	      else if (dR1 < dR1min)                //at least two matched jets                                                         
+		{
+		  if  (dPtOverPt1 < twoSigmaDpt)
+		    {
+		      dR1min  = dR1;
+		      dPtOverPt1min = dPtOverPt1;
+		      mcMatchedT_LdgJet = selJets_p4.at(i);
+		    }
+		}
+	    }
+	}//for(auto Bjet: selectedBJets)
+      
+      // Check if TOP is genuine                                                                                                       
+      
+      bool isGenuine = false;
+      isGenuine = (dR1min<= dRcut && dR2min <= dRcut && dRminB.at(i) <= dRcut);
+      bool twoJMatched = isGenuine;  //at least two matched jets two top decay products (used for plots)
+      if (!twoJMatched) twoJMatched = max(dR1min, dR2min) <= dRcut || max(dR1min, dRminB.at(i)) <= dRcut || max(dR2min, dRminB.at(i)) <= dRcut;
+      
+      h_TopQuarkPt_isGenuineTop -> Fill(isGenuine, bHt_TQuark_p4.pt());
+      if (isGenuine)
+	{
+	  if(0) std::cout << "=== bag51" << std::endl;
+	  math::XYZTLorentzVector ldgJet_p4;
+	  math::XYZTLorentzVector subldgJet_p4;
+	  math::XYZTLorentzVector Tbjet_p4, dijet_p4, trijet_p4;
+	  if(0) std::cout << "=== bag511" << std::endl;
+	  ldgJet_p4    = mcMatchedT_LdgJet;
+	  if(0) std::cout << "=== bag512" << std::endl;
+	  subldgJet_p4 = mcMatchedT_SubldgJet;
+	  if(0) std::cout << "=== bag513" << std::endl;
+	  Tbjet_p4 = mcMatchedT_BJet;
+	  if(0) std::cout << "=== bag58" << std::endl;
+	  dijet_p4  = ldgJet_p4 + subldgJet_p4;
+	  trijet_p4 = ldgJet_p4 + subldgJet_p4 + Tbjet_p4;
+	  if(0) std::cout << "=== bag52" << std::endl;
+	  double dR_j1j2 = ROOT::Math::VectorUtil::DeltaR(ldgJet_p4, subldgJet_p4);
+	  double dR_j1b  = ROOT::Math::VectorUtil::DeltaR(ldgJet_p4, Tbjet_p4);
+	  double dR_j2b  = ROOT::Math::VectorUtil::DeltaR(subldgJet_p4, Tbjet_p4);
+	  
+	  // bool mergedDijet            = dR_j1j2 < 0.8 && dR_j1b > 0.8 && dR_j2b > 0.8 && max(ldgJet.bjetDiscriminator(), subldgJet.bjetDiscriminator()) < 0.5426;
       // bool mergedTrijet_untaggedW = max(dR_j1j2, max(dR_j1b, dR_j2b)) < 0.8 && max(ldgJet.bjetDiscriminator(), subldgJet.bjetDiscriminator()) < 0.5426;
       /*
       bool mergedDijet            = dR_j1j2 < 0.8 && dR_j1b > 0.8 && dR_j2b > 0.8;
       bool mergedTrijet           = max(dR_j1j2, max(dR_j1b, dR_j2b)) < 0.8;
       bool mergedJB               = dR_j1j2 > 0.8 && max(dR_j1b, dR_j2b) > 0.8 && min(dR_j1b, dR_j2b) < 0.8;
       */
-      double dR_dijet_bjet = ROOT::Math::VectorUtil::DeltaR(dijet_p4 , Tbjet_p4);
-      if(0) std::cout << "=== bag53" << std::endl;
-      h_GenuineTop_ldgJet_Pt         -> Fill(ldgJet_p4.pt());
-      h_GenuineTop_subldgJet_Pt      -> Fill(subldgJet_p4.pt());
-      h_GenuineTop_Bjet_Pt           -> Fill(Tbjet_p4.pt());
-      h_GenuineTop_Dijet_dR          -> Fill(dR_j1j2);
-      h_GenuineTop_ldgJet_Bjet_dR    -> Fill(dR_j1b);
-      h_GenuineTop_subJet_Bjet_dR    -> Fill(dR_j2b); 
-      h_GenuineTop_Dijet_Bjet_dR     -> Fill(dR_dijet_bjet);
-      h_GenuineTop_Dijet_Pt          -> Fill(dijet_p4.pt());
-      h_GenuineTop_Dijet_M           -> Fill(dijet_p4.M());
-      h_GenuineTop_Trijet_Pt         -> Fill(trijet_p4.pt());
-      h_GenuineTop_Trijet_M          -> Fill(trijet_p4.M());
-    }
-
+	  double dR_dijet_bjet = ROOT::Math::VectorUtil::DeltaR(dijet_p4 , Tbjet_p4);
+	  if(0) std::cout << "=== bag53" << std::endl;
+	  h_GenuineTop_ldgJet_Pt         -> Fill(ldgJet_p4.pt());
+	  h_GenuineTop_subldgJet_Pt      -> Fill(subldgJet_p4.pt());
+	  h_GenuineTop_Bjet_Pt           -> Fill(Tbjet_p4.pt());
+	  h_GenuineTop_Dijet_dR          -> Fill(dR_j1j2);
+	  h_GenuineTop_ldgJet_Bjet_dR    -> Fill(dR_j1b);
+	  h_GenuineTop_subJet_Bjet_dR    -> Fill(dR_j2b); 
+	  h_GenuineTop_Dijet_Bjet_dR     -> Fill(dR_dijet_bjet);
+	  h_GenuineTop_Dijet_Pt          -> Fill(dijet_p4.pt());
+	  h_GenuineTop_Dijet_M           -> Fill(dijet_p4.M());
+	  h_GenuineTop_Trijet_Pt         -> Fill(trijet_p4.pt());
+	  h_GenuineTop_Trijet_M          -> Fill(trijet_p4.M());
+	}
+    }//For-loop: All top-quarks
 
 
   //==================================================================================================================
@@ -1188,6 +1275,20 @@ double RecGenHToHW::GetWMt(const math::XYVector muon, const math::XYVector& met)
   mTSq = EtSq - (EtXSq + EtYSq);
   if (mTSq >= 0) mT = std::sqrt(mTSq);
   return mT;
+}
+
+const genParticle RecGenHToHW::GetLastCopy(const vector<genParticle> genParticles, const genParticle &p){
+
+  int gen_pdgId = p.pdgId();
+
+  for (size_t i=0; i<p.daughters().size(); i++){
+
+    const genParticle genDau = genParticles[p.daughters().at(i)];
+    int genDau_pdgId   = genDau.pdgId();
+
+    if (gen_pdgId == genDau_pdgId)  return GetLastCopy(genParticles, genDau);
+  }
+  return p;
 }
 
 

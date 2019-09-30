@@ -231,6 +231,18 @@ def GetHistoKwargs(histoName):
         kwargs["ymax"]   =  5.0
         kwargs["zMin"]   =  1e-1
         kwargs["logZ"]   = True
+    elif "WBoson_Pt_Vs_Pt" in h:
+        kwargs["xlabel"] = "P_{T}^{H^{0}} (GeV/c) "
+        kwargs["rebinX"] =  1
+        kwargs["rebinY"] =  1
+        #kwargs["xmin"]   =  0.0
+        #kwargs["xmax"]   =  1500.0
+        kwargs["opts"]   = {"xmin": 0.0, "xmax": 1500.0}
+        #kwargs["ymin"]   =  0.0
+        #kwargs["ymax"]   =  1500.0
+        kwargs["opts"]   = {"ymin": 0.0, "ymax": 1500.0}
+        kwargs["zMin"]   =  1e-1
+        kwargs["logZ"]   = True
     elif "BQuark1_BQuark2_dEta_Vs_dPhi" in h:
         kwargs["rebinX"] =  1
         kwargs["rebinY"] =  1
@@ -357,7 +369,7 @@ def Plot2d(datasetsMgr, dataset, histoName, kwargs, opts):
         p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetXaxis().SetTitle(kwargs.get("xlabel")))
         p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetYaxis().SetTitle(kwargs.get("ylabel")))
         # p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetXaxis().SetTitle( h.getRootHisto().GetXaxis().GetTitle() + "%0.1f" ))
-    p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetXaxis().SetRangeUser(kwargs.get("xmin"), kwargs.get("xmax")))
+        p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetXaxis().SetRangeUser(kwargs.get("xmin"), kwargs.get("xmax"))) #chris
     #p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetYaxis().SetRangeUser(kwargs.get("ymin"), kwargs.get("ymax")))
 
     #p.histoMgr.forEachHisto(lambda h: h.getRootHisto().GetYaxis().SetRangeUser(kwargs.get("ymin"), kwargs.get("ymax")))
@@ -371,7 +383,7 @@ def Plot2d(datasetsMgr, dataset, histoName, kwargs, opts):
     SetLogAndGrid(p, **kwargs)
 
     # Add cut line/box
-    if 1:
+    if 0: #chris
         _kwargs = { "lessThan": True}
         p.addCutBoxAndLine(cutValue=400.0, fillColor=ROOT.kGray, box=False, line=True, **_kwargs)
         p.addCutBoxAndLineY(cutValue=200.0, fillColor=ROOT.kGray, box=False, line=True, **_kwargs)

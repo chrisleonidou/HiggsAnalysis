@@ -196,7 +196,7 @@ def GetHistoKwargs(histo, opts):
     else:
         yLabel = "Events"
     logY       = False
-    yMaxFactor = 3 #1.2 chris
+    yMaxFactor = 2 #3 chris
 
     # Create with default values
     kwargs = {
@@ -228,27 +228,50 @@ def GetHistoKwargs(histo, opts):
         kwargs["opts"]   = {"xmin": 500.0, "xmax": 2000.0}
         kwargs["log"]    = True
         ROOT.gStyle.SetNdivisions(10, "X")
-    elif histo.lower().endswith("met_et"):
+    elif histo.lower().endswith("_et"):
         units            = "GeV"
         format           = "%0.0f " + units
         kwargs["xlabel"] = "E_{T}^{miss} (%s)" % units
         kwargs["ylabel"] = yLabel + "/ %s " % format
         kwargs["opts"]   = {"xmin": 0.0, "xmax": 800.0}
         kwargs["log"]    = True
-    elif histo.endswith("_M"): #chris
+    elif histo.endswith("_MT"): #chris
         #print "I find _M"
         units            = "GeV"
         format           = "%0.0f " + units
         kwargs["xlabel"] = "m_{T} (%s)" % units
         kwargs["ylabel"] = yLabel + " / %s " % format
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +1500.0}
+        if "_W_" in histo:
+            kwargs["opts"]   = {"xmin": 0.0, "xmax": +400.0}
+        if "_WCor_" in histo:
+            kwargs["opts"]   = {"xmin": 0.0, "xmax": +150.0}    
+    elif histo.endswith("_Tau_Tau_dR"):
+        units            = ""
+        format           = "%0.0f " + units
+        kwargs["xlabel"] = "#Delta R"
+        kwargs["ylabel"] = yLabel + " / %.1f " +  units
+        kwargs["opts"]   = {"xmin": 0.0, "xmax": +10.0}
+        #chris
+        kwargs["cutBox"] = {"cutValue": 0.8, "fillColor": 16, "box": False, "line": True, "greaterThan": True}
+    elif histo.endswith("_M"):
+        units            = "GeV"
+        format           = "%0.0f " + units
+        kwargs["xlabel"] = "m (%s)" % units
+        kwargs["ylabel"] = yLabel + " / %s " % format
+        if "muon" in histo:
+            kwargs["opts"]   = {"xmin": 0.0, "xmax": +0.5}
+        if "tau" in histo:
+            kwargs["opts"]   = {"xmin": 0.0, "xmax": +5.0}
+        if "_h_M" in histo:
+            kwargs["opts"]   = {"xmin": 0.0, "xmax": +300.0}
     elif histo.lower().endswith("_n"):
         units            = ""
         format           = "%0.0f " + units
         kwargs["xlabel"] = "multiplicity"
         kwargs["ylabel"] = yLabel + " / %.1f " +  units
         kwargs["opts"]   = {"xmin": 0.0, "xmax": +16.0}
-    elif histo.lower().endswith("_pt"):
+    elif histo.lower().endswith("_pt"): #chris
         units            = "GeV/c"
         format           = " / %0.0f " + units
         kwargs["xlabel"] = "p_{T} (%s)" % units
@@ -351,7 +374,7 @@ def GetHistoKwargs(histo, opts):
     if kwargs["log"] == True:
         yMaxFactor = 2 #2 chris for eta 16
     else:
-        yMaxFactor = 2 #1.2 for eta 16 for dphi 1.6
+        yMaxFactor = 1.2 #1.2 for eta 16 for dphi 1.6
 
     # Finalise and return
     kwargs["opts"]["ymaxfactor"] = yMaxFactor
@@ -359,8 +382,8 @@ def GetHistoKwargs(histo, opts):
     return kwargs
   
 def PlotMC(datasetsMgr, histo, intLumi):
-    dName  = "HplusHW_M300_M200"
-    dName2 = "HplusHW_M700_M200"
+    #dName  = "HplusHW_M300_M200"
+    #dName2 = "HplusHW_M700_M200"
     #dName =  "ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO" #%(700, 300)
     #dName = "ChargedHiggs_HplusTB_HplusToHW_M300_mH200_2ta_NLO"
     kwargs = {}
@@ -371,17 +394,18 @@ def PlotMC(datasetsMgr, histo, intLumi):
     #chris
     #   print type(p) , type(dName)
         
-    if "Tau_Tau_dR" in histo:
-        histoinc = p.histoMgr.getHisto(dName).getRootHisto().Clone("Eff_Tau_Tau_dR")
-        cutdr = histoinc.GetXaxis().FindBin(0.8)
+    #if "tbH_HPlus_DRCut_Pt" in histo:
+     #   histoinc = p.histoMgr.getHisto(dName).getRootHisto().Clone("Eff_Tau_Tau_dR")
+        #cutdr = histoinc.GetXaxis().FindBin(0.8)
         #cutdr = ROOT.Double(0.8)
         #Eff = 1/histoinc.Integral()
-        histoinc2 = p.histoMgr.getHisto(dName2).getRootHisto().Clone("Eff_Tau_Tau_dR2")
-        Eff700 = histoinc2.Integral(0, cutdr) / histoinc2.Integral()
-        Eff300 = histoinc.Integral(0, cutdr) / histoinc.Integral()
+     #   histoinc2 = p.histoMgr.getHisto(dName2).getRootHisto().Clone("Eff_Tau_Tau_dR2")
+      #  cutdr = histoinc2.GetXaxis().FindBin(0.8)
+       # HPlusFat700 = histoinc2.Integral()
+      #  HPlusFat300 = histoinc.Integral()
        # Eff =  histoinc.Integral()
-        print "Eff300 =" , Eff300 * 100
-        print "Eff700 =" , Eff700 * 100
+        #print "HPlusFat700 =" , HPlusFat700
+       # print "HPlusFat300 =" , HPlusFat300
         
     # Get histogram<->kwargs dictionary 
     kwargs = GetHistoKwargs(histo, opts)
