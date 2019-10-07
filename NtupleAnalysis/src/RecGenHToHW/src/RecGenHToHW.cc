@@ -43,7 +43,17 @@ public:
   virtual double GetWMt(const math::XYVector muon, const math::XYVector& met);
   virtual double GetWMt2(const math::XYZTLorentzVector muon, const math::XYZTLorentzVector neut);
   const genParticle GetLastCopy(const vector<genParticle> genParticles, const genParticle &p);
+  virtual vector<genParticle> GetGenParticlesRec(const vector<genParticle> genParticles, const int pdgId);
+  Bool_t AreHadroDau(const vector<genParticle> genParticles, const vector<genParticle> genP);
+  Bool_t IshadronicTop(const vector<genParticle> genParticles, const vector<genParticle> genP);
+
+
 private:
+  CommonPlots fCommonPlots;
+  TauSelection fTauSelection;
+  JetSelection fJetSelection;
+  //ElectronSelection fElectronSelection;
+  //MuonSelection fMuonSelection;
 
   // Input parameters
   const double cfg_Verbose;
@@ -99,17 +109,18 @@ private:
   WrappedTH1 *hParticle_Pt;
   WrappedTH1 *h_htau1_htau2_dR;
   WrappedTH1 *h_HPus_dRCut_Pt;
-  WrappedTH1 *h_bHt_tbW_BQuark_Pt;
-  WrappedTH1 *h_bHt_tbW_BQuark_Eta;
-  WrappedTH1 *h_bHt_tWb_Wqq_Pt;
-  WrappedTH1 *h_bHt_tWb_Wqq_Eta;
   WrappedTH1 *h_bHt_tWb_Wqq_qq_dR;
   WrappedTH1 *h_bHt_tWb_Wqq_qq_dEta;
 
   //For Efficiency plots
   WrappedTH1Triplet *h_TopQuarkPt_isGenuineTop;
   //WrappedTH1 *h_TopQuarkPt_isGenuineTop;
-  
+  //Genuine W from Top
+  WrappedTH1 *h_GenuineWfromTop_Dijet_M;
+  WrappedTH1 *h_GenuineWfromTop_ldgJet_Pt;
+  WrappedTH1 *h_GenuineWfromTop_subldgJet_Pt;
+  WrappedTH1 *h_GenuineWfromTop_Dijet_Pt;
+  WrappedTH1 *h_GenuineWfromTop_Dijet_dR;
   //Genuine Top
   WrappedTH1 *h_GenuineTop_ldgJet_Pt;
   WrappedTH1 *h_GenuineTop_subldgJet_Pt;
@@ -124,40 +135,6 @@ private:
   WrappedTH1 *h_GenuineTop_Trijet_M;
 
 
-  // GenJets                                                                                                                                
-  WrappedTH1 *h_GenJets_N;
-  WrappedTH1 *h_GenJet1_Pt;
-  WrappedTH1 *h_GenJet2_Pt;
-  WrappedTH1 *h_GenJet3_Pt;
-  WrappedTH1 *h_GenJet4_Pt;
-  WrappedTH1 *h_GenJet5_Pt;
-  WrappedTH1 *h_GenJet6_Pt;
-  //                                                                                                                                        
-  WrappedTH1 *h_GenJet1_Eta;
-  WrappedTH1 *h_GenJet2_Eta;
-  WrappedTH1 *h_GenJet3_Eta;
-  WrappedTH1 *h_GenJet4_Eta;
-  WrappedTH1 *h_GenJet5_Eta;
-  WrappedTH1 *h_GenJet6_Eta;
-  // GenJets: Trijet with largest pT                                                                                                        
-  WrappedTH1 *h_MaxTriJetPt_Pt;
-  WrappedTH1 *h_MaxTriJetPt_Eta;
-  WrappedTH1 *h_MaxTriJetPt_Rap;
-  WrappedTH1 *h_MaxTriJetPt_Mass;
-  WrappedTH1 *h_MaxTriJetPt_dEtaMax;
-  WrappedTH1 *h_MaxTriJetPt_dPhiMax;
-  WrappedTH1 *h_MaxTriJetPt_dRMax;
-  WrappedTH1 *h_MaxTriJetPt_dEtaMin;
-  WrappedTH1 *h_MaxTriJetPt_dPhiMin;
-  WrappedTH1 *h_MaxTriJetPt_dRMin;
-  WrappedTH1 *h_MaxTriJetPt_dEtaAverage;
-  WrappedTH1 *h_MaxTriJetPt_dPhiAverage;
-  WrappedTH1 *h_MaxTriJetPt_dRAverage;
-  WrappedTH1 *h_TriJetMaxPt_bHt_TQuark_dR;
-  WrappedTH1 *h_TriJetMaxPt_Over_bHt_TQuarkPt;
-  WrappedTH1 *h_TriJetMaxPt_Top_M;
-  WrappedTH1 *h_TriJetMaxPt_Top_OverCut_M;
-
 };
 
 #include "Framework/interface/SelectorFactory.h"
@@ -165,6 +142,11 @@ REGISTER_SELECTOR(RecGenHToHW);
 
 RecGenHToHW::RecGenHToHW(const ParameterSet& config, const TH1* skimCounters)
   : BaseSelector(config, skimCounters),
+    fCommonPlots(config.getParameter<ParameterSet>("CommonPlots"), CommonPlots::kHplus2HWAnalysis, fHistoWrapper),
+    fTauSelection(config.getParameter<ParameterSet>("TauSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    fJetSelection(config.getParameter<ParameterSet>("JetSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
+    //fElectronSelection(config.getParameter<ParameterSet>("ElectronSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, "Veto"),
+    //fMuonSelection(config.getParameter<ParameterSet>("MuonSelection"), fEventCounter, fHistoWrapper, &fCommonPlots, ""),
     cfg_Verbose(config.getParameter<bool>("verbose")),
     PSet_ElectronSelection(config.getParameter<ParameterSet>("ElectronSelection")),
     cfg_ElectronPtCut(config.getParameter<float>("ElectronSelection.electronPtCut")),  
@@ -223,6 +205,12 @@ RecGenHToHW::RecGenHToHW(const ParameterSet& config, const TH1* skimCounters)
 
 void RecGenHToHW::book(TDirectory *dir) {
   
+  // Book common plots histograms
+  fCommonPlots.book(dir, isData());
+  // Book histograms in event selection classes
+  fTauSelection.bookHistograms(dir);
+  fJetSelection.bookHistograms(dir);
+
   // Fixed binning
   const int nBinsPt   = 4*cfg_PtBinSetting.bins();
   const double minPt  = cfg_PtBinSetting.min();
@@ -273,64 +261,33 @@ void RecGenHToHW::book(TDirectory *dir) {
   hParticle_Pt                  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "AllParticle_Pt"           , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_htau1_htau2_dR              = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_htau1_htau2_dR"         , ";#DeltaR"      , nBinsdR, mindR, maxdR);
   h_HPus_dRCut_Pt               = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_HPus_dRCut_Pt"          , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
-  h_bHt_tbW_BQuark_Pt           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_bHt_tbW_BQuark_Pt"      , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
-  h_bHt_tbW_BQuark_Eta          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_bHt_tbW_BQuark_Eta"     , ";#eta"      , nBinsEta, minEta, maxEta);
-  h_bHt_tWb_Wqq_Pt              = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_bHt_tWb_Wqq_Pt"         , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
-  h_bHt_tWb_Wqq_Eta             = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_bHt_tWb_Wqq_Eta"        , ";#eta"      , nBinsEta, minEta, maxEta);
   h_bHt_tWb_Wqq_qq_dR           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_bHt_tWb_Wqq_qq_dR"      , ";#DeltaR"      , nBinsdR, mindR, maxdR);
   h_bHt_tWb_Wqq_qq_dEta         = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_bHt_tWb_Wqq_qq_dEta"    , ";#Delta#eta"   , nBinsdEta, mindEta, maxdEta);
   
   //For Efficiency plots
   h_TopQuarkPt_isGenuineTop = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "h_TopQuarkPt_isGenuineTop",  ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   //h_TopQuarkPt_isGenuineTop = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_TopQuarkPt_isGenuineTop"           , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
-  
+  //Genuine W from Top 
+  h_GenuineWfromTop_Dijet_M      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineWfromTop_Dijet_M"     , ";M (GeV/c^{2})", 100    , minM , 200. );
+  h_GenuineWfromTop_ldgJet_Pt    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineWfromTop_ldgJet_Pt"   , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
+  h_GenuineWfromTop_subldgJet_Pt = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineWfromTop_subldgJet_Pt", ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
+  h_GenuineWfromTop_Dijet_Pt     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineWfromTop_Dijet_Pt"    , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
+  h_GenuineWfromTop_Dijet_dR     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineWfromTop_Dijet_dR"    , ";#DeltaR"      , nBinsdR, mindR, maxdR);
+
   //Genuine Top
   h_GenuineTop_ldgJet_Pt      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_ldgJet_Pt"     , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_GenuineTop_subldgJet_Pt   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_subldgJet_Pt"  , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_GenuineTop_Bjet_Pt        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Bjet_Pt"       , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_GenuineTop_Dijet_Pt       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Dijet_Pt"      , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_GenuineTop_Trijet_Pt      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Trijet_Pt"     , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
-  h_GenuineTop_Dijet_dR       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Dijet_dR"      , ";#DeltaR"      , 50, mindR, maxdR);
-  h_GenuineTop_ldgJet_Bjet_dR = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_ldgJet_Bjet_dR", ";#DeltaR"      , 50, mindR, maxdR);
-  h_GenuineTop_subJet_Bjet_dR = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_subJet_Bjet_dR", ";#DeltaR"      , 50, mindR, maxdR);
-  h_GenuineTop_Dijet_Bjet_dR  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Dijet_Bjet_dR" , ";#DeltaR"      , 50, mindR, maxdR);
+  h_GenuineTop_Dijet_dR       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Dijet_dR"      , ";#DeltaR"      , nBinsdR, mindR, maxdR);
+  h_GenuineTop_ldgJet_Bjet_dR = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_ldgJet_Bjet_dR", ";#DeltaR"      , nBinsdR, mindR, maxdR);
+  h_GenuineTop_subJet_Bjet_dR = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_subJet_Bjet_dR", ";#DeltaR"      , nBinsdR, mindR, maxdR);
+  h_GenuineTop_Dijet_Bjet_dR  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Dijet_Bjet_dR" , ";#DeltaR"      , nBinsdR, mindR, maxdR);
   h_GenuineTop_Dijet_M        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Dijet_M"       , ";M (GeV/c^{2})", 100    , minM , 200.);
   h_GenuineTop_Trijet_M       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Trijet_M"      , ";M (GeV/c^{2})", 100    , minM , 500.);
 
-  // GenJets                                                                                                                                
-  h_GenJets_N   = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "GenJets_N" , ";genJet multiplicity", 30, 0.0, 30.0);
-  h_GenJet1_Pt  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "GenJet1_Pt", ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
-  h_GenJet2_Pt  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "GenJet2_Pt", ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
-  h_GenJet3_Pt  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "GenJet3_Pt", ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
-  h_GenJet4_Pt  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "GenJet4_Pt", ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
-  h_GenJet5_Pt  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "GenJet5_Pt", ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
-  h_GenJet6_Pt  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "GenJet6_Pt", ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
-  //                                                                                                                                        
-  h_GenJet1_Eta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "GenJet1_Eta", ";#eta", nBinsEta, minEta, maxEta);
-  h_GenJet2_Eta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "GenJet2_Eta", ";#eta", nBinsEta, minEta, maxEta);
-  h_GenJet3_Eta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "GenJet3_Eta", ";#eta", nBinsEta, minEta, maxEta);
-  h_GenJet4_Eta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "GenJet4_Eta", ";#eta", nBinsEta, minEta, maxEta);
-  h_GenJet5_Eta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "GenJet5_Eta", ";#eta", nBinsEta, minEta, maxEta);
-  h_GenJet6_Eta = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "GenJet6_Eta", ";#eta", nBinsEta, minEta, maxEta);
-  // GenJets: Trijet with largest pT                                                                                                        
-  h_MaxTriJetPt_Pt       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, th1, "MaxTriJetPt_Pt"     , ";p_{T} (GeV/c)", nBinsPt  , minPt  , maxPt );
-  h_MaxTriJetPt_Eta      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, th1, "MaxTriJetPt_Eta"    , ";#eta"         , nBinsEta , minEta , maxEta);
-  h_MaxTriJetPt_Rap      = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, th1, "MaxTriJetPt_Rap"    , ";#omega"       , nBinsRap , minRap , maxRap);
-  h_MaxTriJetPt_Mass     = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, th1, "MaxTriJetPt_Mass"   , ";M (GeV/c^{2})", 200   , minM   , 1000.  );
-  h_MaxTriJetPt_dEtaMax  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, th1, "MaxTriJetPt_dEtaMax", ";#Delta#eta"   , nBinsdEta, mindEta, maxdEta);
-  h_MaxTriJetPt_dPhiMax  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, th1, "MaxTriJetPt_dPhiMax", ";#Delta#phi"   , nBinsdPhi, mindPhi, maxdPhi);
-  h_MaxTriJetPt_dRMax    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, th1, "MaxTriJetPt_dRMax"  , ";#DeltaR"      , nBinsdR  , mindR  , maxdR  );
-  h_MaxTriJetPt_dEtaMin  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, th1, "MaxTriJetPt_dEtaMin", ";#Delta#eta"   , nBinsdEta, mindEta, maxdEta);
-  h_MaxTriJetPt_dPhiMin  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, th1, "MaxTriJetPt_dPhiMin", ";#Delta#phi"   , nBinsdPhi, mindPhi, maxdPhi);
-  h_MaxTriJetPt_dRMin    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, th1, "MaxTriJetPt_dRMin"  , ";#DeltaR"      , nBinsdR  , mindR  , maxdR  );
-  h_MaxTriJetPt_dEtaAverage  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, th1, "MaxTriJetPt_dEtaAverage", ";#Delta#eta"  , nBinsdEta, mindEta, maxdEta);
-  h_MaxTriJetPt_dPhiAverage  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, th1, "MaxTriJetPt_dPhiAverage", ";#Delta#phi"  , nBinsdPhi, mindPhi, maxdPhi);
-  h_MaxTriJetPt_dRAverage    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, th1, "MaxTriJetPt_dRAverage"  , ";#Delta#omega", nBinsdRap, mindRap, maxdRap);
-  h_TriJetMaxPt_bHt_TQuark_dR  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, th1, "TriJetMaxPt_bHt_TQuark_dR",";#DeltaR"      , nBinsdR  , mindR  , maxdR  );
-  h_TriJetMaxPt_Over_bHt_TQuarkPt = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, th1, "h_TriJetMaxPt_Over_bHt_TQuarkPt", "" ,nBinsdR  , mindR  , maxdR  );
-  h_TriJetMaxPt_Top_M    = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, th1, "h_TriJetMaxPt_Top_M", ";M (GeV/c^{2})", 100   , minM   , 500.  );
-  h_TriJetMaxPt_Top_OverCut_M = fHistoWrapper.makeTH<TH1F>(HistoLevel::kInformative, th1, "h_TriJetMaxPt_Top_OverCut_M", ";M (GeV/c^{2})", 100   , minM   , 500.  );
-
+  
 
   return;
 }
@@ -344,14 +301,16 @@ void RecGenHToHW::setupBranches(BranchManager& branchManager) {
 
 void RecGenHToHW::process(Long64_t entry) {
 
-  if ( !fEvent.isMC() ) return;
+  //if ( !fEvent.isMC() ) return;
   
   // Create MCools object
   MCTools mcTools(fEvent);
   
   // Increment Counter
+  fCommonPlots.initialize();
+  fCommonPlots.setFactorisationBinForEvent(std::vector<float> {});
   cAllEvents.increment();
-
+  
   //================================================================================================
   // 1) Apply trigger
   //================================================================================================
@@ -370,19 +329,28 @@ void RecGenHToHW::process(Long64_t entry) {
   //================================================================================================
 
 
+
+  
+  
   //================================================================================================
   // 4) Electron veto (fully hadronic + orthogonality)  
   //================================================================================================
-  //  if (cfg_Verbose) std::cout << "=== Electron veto" << std::endl;
-  //vector<genParticle> selectedElectrons = GetGenParticles(fEvent.genparticles().getGenParticles(), cfg_ElectronPtCut, cfg_ElectronEtaCut, 11, true, false);
+  //const ElectronSelection::Data eData = fElectronSelection.analyze(fEvent);
+  //if (eData.hasIdentifiedElectrons())
+  //return;
+
+  
+  /*
+  if (cfg_Verbose) std::cout << "=== Electron veto" << std::endl;
+  vector<genParticle> selectedElectrons = GetGenParticles(fEvent.genparticles().getGenParticles(), cfg_ElectronPtCut, cfg_ElectronEtaCut, 11, true, false);
   //if (0)
   // {
   //  std::cout << "\nnElectrons = " << selectedElectrons.size() << std::endl;
   //  for (auto& p: selectedElectrons) std::cout << "\tpT = " << p.pt() << " (GeV/c), eta = " << p.eta() << ", phi = " << p.phi() << " (rads), status = " << p.status() << std::endl;
   //}
-  //if ( selectedElectrons.size() > 0 ) return;
-  //cElectronVeto.increment();
-
+  if ( selectedElectrons.size() > 0 ) return;
+  cElectronVeto.increment();
+  */
   
   //================================================================================================
   // 5) Muon selection
@@ -395,7 +363,22 @@ void RecGenHToHW::process(Long64_t entry) {
       for (auto& p: selectedMuons) std::cout << "\tpT = " << p.pt() << " (GeV/c), eta = " << p.eta() << ", phi = " << p.phi() << " (rads), status = " << p.status() << std::endl;
     } 
   if ( selectedMuons.size() < 1 ) return;
+  
+  //const MuonSelection::Data muData = fMuonSelection.analyze(fEvent);
+  //if (!muData.hasIdentifiedMuons()) return;
   cMuonVeto.increment();
+  /*
+  //================================================================================================
+  // asso. top selection
+  //================================================================================================  
+  vector<genParticle> selectedTop = GetGenParticles(fEvent.genparticles().getGenParticles(),0., 10., 6, true, false);
+  bool hadronicTop = IshadronicTop(fEvent.genparticles().getGenParticles(), selectedTop);
+  if (!hadronicTop) return;
+  */
+
+  
+  const TauSelection::Data tauData = fTauSelection.analyze(fEvent);
+  if (!tauData.hasIdentifiedTaus()) return;
   
   
   //================================================================================================
@@ -403,15 +386,13 @@ void RecGenHToHW::process(Long64_t entry) {
   //================================================================================================
   if (cfg_Verbose) std::cout << "=== Tau selection" << std::endl;
   vector<genParticle> selectedTaus = GetGenParticles(fEvent.genparticles().getGenParticles(), cfg_TauPtCut, cfg_TauEtaCut, 15, true, false);
-  if (0) 
-    {
-      std::cout << "nTaus = " << selectedTaus.size() << std::endl;
-      for (auto& p: selectedTaus) std::cout << "\tpT = " << p.pt() << " (GeV/c), eta = " << p.eta() << ", phi = " << p.phi() << " (rads), status = " << p.status() << std::endl;
-    }
   if ( selectedTaus.size() < 2 ) return;
   cTauVeto.increment();
   
+  
 
+
+  /*
   //================================================================================================
   // 7) Jet Selection
   //==selectedJets==============================================================================================
@@ -437,10 +418,27 @@ void RecGenHToHW::process(Long64_t entry) {
 
   if ( !cfg_HtCut.passedCut(genJ_HT) ) return;
   cJetSelection.increment();
+  */
   
+  
+  //================================================================================================
+  // 7) Jet selection
+  //=============================================================================================== 
+  if (0) std::cout << "=== Jet selection" << std::endl;
+  const JetSelection::Data jetData = fJetSelection.analyze(fEvent, tauData.getSelectedTau());
+  if (!jetData.passedSelection()) return;
+  
+  std::vector<math::XYZTLorentzVector> selJets_p4;                                                                                                                                                        
+  math::XYZTLorentzVector jet_p4; 
+  for(auto jet: jetData.getSelectedJets())
+    {
+      jet_p4 = jet.p4();
+      //genJ_HT += jet.pt();
+      selJets_p4.push_back( jet_p4 );
+    }
   
 
-  
+  /*
   //================================================================================================
   // 8) BJet Selection
   //================================================================================================
@@ -491,7 +489,7 @@ void RecGenHToHW::process(Long64_t entry) {
     }
 
   if (!cfg_BJetNumberCut.passedCut(selectedBJets.size())) return;
-  
+  */
 
   //================================================================================================
   // 9) BJet SF
@@ -525,8 +523,6 @@ void RecGenHToHW::process(Long64_t entry) {
   if (cfg_Verbose) std::cout << "=== All Selections" << std::endl;
   cSelected.increment();
   
-  // Fill Histograms                                                                                                                        
-  h_GenJets_N->Fill(selectedJets.size());
   
   bool bSkipEvent = false;
   // 4-momenta                                                                                                                                                               
@@ -544,6 +540,8 @@ void RecGenHToHW::process(Long64_t entry) {
   std::vector<math::XYZTLorentzVector> v_bHt_tWb_Wqq_p4;
   std::vector<math::XYZTLorentzVector> v_bHt_TQuark_p4;
   std::vector<math::XYZTLorentzVector> v_bHt_tbW_BQuark_p4;
+  std::vector<genParticle> GenTops;
+  //std::vector<genParticle> GenTops_BQuark;
   //bool assWHadr = false;
   // Define the table                                                                                                                                                                                     
   Table table("Evt | Index | PdgId | Status | Charge | Pt | Eta | Phi | E | Vertex (mm) | D0 (mm) | Lxy (mm) | Mom | Daughters", "Text"); //LaTeX or Text
@@ -553,7 +551,7 @@ void RecGenHToHW::process(Long64_t entry) {
   //int qourkc = 0;
   // For-loop: GenParticles
   for (auto& p: fEvent.genparticles().getGenParticles()) {
-        
+    
     hParticle_Pt -> Fill(p.pt());
     //int genMom_index = -1; 
     //double genMom_pdgId = -999.99; 
@@ -583,7 +581,6 @@ void RecGenHToHW::process(Long64_t entry) {
     std::vector<unsigned int> genMoms_pdgId;
     std::vector<unsigned int> genDaus_index;
     std::vector<unsigned int> genDaus_pdgId;
-    
 
     // Removed real vertex from Tree (to save size)                                                                                                                                                       
     ROOT::Math::XYZPoint vtxIdeal;
@@ -699,6 +696,7 @@ void RecGenHToHW::process(Long64_t entry) {
       {
         if (!bIsLastCopy) continue;
 	bHt_TQuark_p4 = p.p4();
+	GenTops.push_back(p); //chris
 	v_bHt_TQuark_p4.push_back(bHt_TQuark_p4);
 	for (auto& d: genP_daughters)
 	  {
@@ -706,6 +704,8 @@ void RecGenHToHW::process(Long64_t entry) {
 	      {
 		bHt_tbW_BQuark_p4 = d.p4();
 		v_bHt_tbW_BQuark_p4.push_back(bHt_TQuark_p4);
+		//genParticle b = GetLastCopy(fEvent.genparticles().getGenParticles(), d);
+		//GenTops_BQuark.push_back(d);
 	      }
 	  }
       }
@@ -771,37 +771,40 @@ void RecGenHToHW::process(Long64_t entry) {
       }//if ( abs(genP_pdgId) == 15)
     
 
-
+  
   } //for (auto& p: fEvent.genparticles().getGenParticles()) 
   //h_eventcount -> Fill(allevent);
-  if ( bSkipEvent ) return;  
-  
-  std::vector<genParticle> GenTops;
+  // if ( bSkipEvent ) return;  
+
   std::vector<genParticle> GenTops_BQuark;
   std::vector<genParticle> GenTops_SubldgQuark;
   std::vector<genParticle> GenTops_LdgQuark;
-  genParticle  Gen_Wa;
-  GenTops = GetGenParticles(fEvent.genparticles().getGenParticles(), 6, true, false);
+  int cbquarkbag = 0;
+  if(0) std::cout << "bag1 "  << std::endl;
+  //vector<genParticle> GenTops = GetGenParticlesRec(fEvent.genparticles().getGenParticles(), 6);
+  if(0) std::cout << "GenTops size = " << GenTops.size() << std::endl;
   // For-loop: All top quarks                                                                                                               
+  
   for (auto& top: GenTops){
-
+    genParticle  Gen_Wa;
     bool FoundBQuark = false;
     std::vector<genParticle> quarks;
     genParticle bquark;
     // For-loop: Top quark daughters (Nested)                                                                                               
     for (size_t i=0; i<top.daughters().size(); i++)
       {
-
         int dau_index = top.daughters().at(i);
         genParticle dau = fEvent.genparticles().getGenParticles()[dau_index];
-
+	if(0) std::cout << "dau.pdgId()) == " << dau.pdgId() << std::endl;
         // B-Quark                                                                                                                          
         if (std::abs(dau.pdgId()) ==  5)
           {
             bquark = dau;
+	    if(0) std::cout << "GenBQuark pt = " << bquark.pt() << std::endl;
             FoundBQuark = true;
-          }
-
+	    cbquarkbag++;
+	  }
+	
         // W-Boson   
 	if (std::abs(dau.pdgId()) == 24)
           {
@@ -816,7 +819,7 @@ void RecGenHToHW::process(Long64_t entry) {
 		
                 int Wdau_index = W.daughters().at(idau);
                 genParticle Wdau = fEvent.genparticles().getGenParticles()[Wdau_index];
-
+		
                 // Consider only quarks as decaying products                                                                                
                 if (std::abs(Wdau.pdgId()) > 5) continue;
 		
@@ -826,16 +829,15 @@ void RecGenHToHW::process(Long64_t entry) {
 	    
           }//W-boson
       }//Top-quark daughters                                                                                                                
-
+    
     // Skip top if b-quark is not found (i.e. top decays to W and c)                                                                        
     if (!FoundBQuark) continue;
     // Skip top if it decays leptonically (the "quarks" vector will be empty causing errors)                                                
-
+    if(0) std::cout << "quarks size = " << quarks.size() << std::endl;
     if (quarks.size() < 2) continue;
     // Fill vectors for b-quarks, leading and subleading quarks coming from tops      
-    
     GenTops_BQuark.push_back(bquark);
-
+    if(0) std::cout << "BQuark size = " << GenTops_BQuark.size() << std::endl;
     if (quarks.at(0).pt() > quarks.at(1).pt())
       {
         GenTops_LdgQuark.push_back(quarks.at(0));
@@ -848,6 +850,7 @@ void RecGenHToHW::process(Long64_t entry) {
       }
     
   } // For-Loop over top quarks  
+  
   
   if (v_bHt_HWh_h_vistau_p4.size() > 0 )
     {
@@ -865,399 +868,212 @@ void RecGenHToHW::process(Long64_t entry) {
 	    }
 	}
     }
+  
   double htau1_htau2_dR = ROOT::Math::VectorUtil::DeltaR(htau1_p4, htau2_p4);
   h_htau1_htau2_dR -> Fill(htau1_htau2_dR);
   if (htau1_htau2_dR <= 0.8)
     {
-      h_HPus_dRCut_Pt ->Fill(Htb_HPlus_p4.pt());
+      h_HPus_dRCut_Pt -> Fill(Htb_HPlus_p4.pt());
       cFatTau.increment();
     }
-  // GenPa histo
-
-  h_bHt_tbW_BQuark_Pt -> Fill(bHt_tbW_BQuark_p4.pt());
-  h_bHt_tbW_BQuark_Eta -> Fill(bHt_tbW_BQuark_p4.eta());
   
-  for (size_t i=0; i < v_bHt_tWb_Wqq_p4.size(); i++)
-    {
-      h_bHt_tWb_Wqq_Pt -> Fill(v_bHt_tWb_Wqq_p4.at(i).Pt());
-      h_bHt_tWb_Wqq_Eta -> Fill(v_bHt_tWb_Wqq_p4.at(i).eta());
-    }
-  math::XYZTLorentzVector GenT_LdgQuark_p4, GenT_SubldgQuark_p4;
-  if (v_bHt_tWb_Wqq_p4.size() > 1)
-    {
-      if (v_bHt_tWb_Wqq_p4.at(0).pt() > v_bHt_tWb_Wqq_p4.at(1).pt() )
-	{
-	  GenT_LdgQuark_p4     = v_bHt_tWb_Wqq_p4.at(0);
-	  GenT_SubldgQuark_p4 = v_bHt_tWb_Wqq_p4.at(1);
-	}
-      else
-	{
-	  GenT_LdgQuark_p4     = v_bHt_tWb_Wqq_p4.at(1);
-          GenT_SubldgQuark_p4 = v_bHt_tWb_Wqq_p4.at(0);
-	}
-      double bHt_tWb_Wqq_qq_dR = ROOT::Math::VectorUtil::DeltaR(v_bHt_tWb_Wqq_p4.at(0), v_bHt_tWb_Wqq_p4.at(1));
-      h_bHt_tWb_Wqq_qq_dR -> Fill(bHt_tWb_Wqq_qq_dR);
-      double bHt_tWb_Wqq_qq_dEta = std::abs(v_bHt_tWb_Wqq_p4.at(0).eta() - v_bHt_tWb_Wqq_p4.at(1).eta());
-      h_bHt_tWb_Wqq_qq_dEta -> Fill(bHt_tWb_Wqq_qq_dEta);
-    }
-
-  
-  
-  if(0) std::cout << "=== bag1" << std::endl;
-  const double twoSigmaDpt = 0.32;
-  const double dRcut    = 0.4;
-  std::vector<math::XYZTLorentzVector> MGen_LdgJet, MGen_SubldgJet, MGen_Bjet;
+  bool doMatching = (GenTops_BQuark.size() == GenTops.size());
+  const double twoSigmaDpt = 0.39;
+  const double dRcut = 0.4;
   vector <double> dRminB;
-  for (size_t i=0; i<GenTops.size(); i++)
-    {
-      math::XYZTLorentzVector mcMatchedT_BJet;
-      math::XYZTLorentzVector BQuark;
-      BQuark = GenTops_BQuark.at(i).p4();
-      double dRmin   = 9999.9;
-      double dRminIn = 0.4;
-      // Do matching
-      if(0) std::cout << "=== bag2" << std::endl;
-      for(size_t i=0; i < selJets_p4.size(); i++)
-	{
-	  double dR = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(i) , BQuark );
-	  if (dR > dRminIn ) continue;
-	  double dPtOverPt = std::abs((selJets_p4.at(i).pt() - BQuark.pt())/BQuark.pt());
-	  if (dPtOverPt > twoSigmaDpt) continue;
-	  dRmin = dR;
-	  dRminIn = dR;
-	  mcMatchedT_BJet = selJets_p4.at(i);  
-	}
-      dRminB.push_back(dRmin);
-      MGen_LdgJet.push_back(mcMatchedT_BJet);
-    }
-
-
-
-  //h_GenuineTop_Bjet_Pt           -> Fill(mcMatchedT_BJet.pt());
-  
-  for (size_t i=0; i<GenTops.size(); i++)
-    {
-      math::XYZTLorentzVector LdgQuark;
-      LdgQuark = GenTops_LdgQuark.at(i).p4();
-      math::XYZTLorentzVector SubldgQuark;
-      SubldgQuark = GenTops_SubldgQuark.at(i).p4();
-      math::XYZTLorentzVector mcMatchedT_BJet, mcMatchedT_LdgJet, mcMatchedT_SubldgJet;
-      double dR1min, dR2min, dPtOverPt1min, dPtOverPt2min;
-      dR1min = dR2min = dPtOverPt1min = dPtOverPt2min = 99999.9;
-
-      for(size_t i=0; i < selJets_p4.size(); i++)
-	{
-	  // Skip the jets that are matched with bquarks
-	  double dRn = 9999.9;
-	  for (size_t k=0; k<GenTops.size(); k++)
-	    {
-	      if (dRminB.at(k) < dRcut)
-		{
-		  dRn = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(i) , mcMatchedT_BJet);
-		}
-	    }
-	  if( dRn <= 0.8) continue;
-      
-	  // Find dR for the two jets in top-decay dijet
-	  
-	  double dR1 = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(i), LdgQuark);
-	  double dR2 = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(i), SubldgQuark);
-      
-	  // Require both jets to be within dR <= dRcut 
-	  // Calculate dPtOverPt for each jet in top-decay dijet   
-	  
-	  double dPtOverPt1 = std::abs((selJets_p4.at(i).pt() - LdgQuark.pt())/LdgQuark.pt());
-	  double dPtOverPt2 = std::abs((selJets_p4.at(i).pt() - SubldgQuark.pt())/SubldgQuark.pt());
-	  // Find which of the two is the correct match                                                                                 
-	  if (dR1 < dR2)
-	    {
-	      // Is Jet1 closer in eta-phi AND has smaller pT difference?                                                               
-	      if (dR1 < dR1min)
-		{
-		  if (dPtOverPt1 < twoSigmaDpt)
-		    {
-		      dR1min = dR1;
-		      dPtOverPt1min= dPtOverPt1;
-		      mcMatchedT_LdgJet = selJets_p4.at(i);
-		    }
-		}
-	      
-	      // Is Jet2 closer in eta-phi AND has smaller pT difference?                                                           
-	      //else if (dR2 <= dRcut && dR2 < dR2min)  at least two matched jets                                                       
-	      else if (dR2 < dR2min)                  //at least two matched jets                                                       
-		{
-		  if (dPtOverPt2 < twoSigmaDpt)
-		    {
-		      dR2min  = dR2;
-		      dPtOverPt2min = dPtOverPt2;
-		      mcMatchedT_SubldgJet = selJets_p4.at(i);
-		    }
-		}
-	    }
-	  else
-	    {
-	      // Is Jet2 closer in eta-phi AND has smaller pT difference?                                                              
-	      if (dR2 < dR2min)
-		{
-		  if (dPtOverPt2 < twoSigmaDpt)
-		    {
-		      dR2min  = dR2;
-		      dPtOverPt2min = dPtOverPt2;
-		      mcMatchedT_SubldgJet = selJets_p4.at(i);
-		    }
-		}
-	      
-	      // Is Jet2 closer in eta-phi AND has smaller pT difference? 
-	      
-	      else if (dR1 < dR1min)                //at least two matched jets                                                         
-		{
-		  if  (dPtOverPt1 < twoSigmaDpt)
-		    {
-		      dR1min  = dR1;
-		      dPtOverPt1min = dPtOverPt1;
-		      mcMatchedT_LdgJet = selJets_p4.at(i);
-		    }
-		}
-	    }
-	}//for(auto Bjet: selectedBJets)
-      
-      // Check if TOP is genuine                                                                                                       
-      
-      bool isGenuine = false;
-      isGenuine = (dR1min<= dRcut && dR2min <= dRcut && dRminB.at(i) <= dRcut);
-      bool twoJMatched = isGenuine;  //at least two matched jets two top decay products (used for plots)
-      if (!twoJMatched) twoJMatched = max(dR1min, dR2min) <= dRcut || max(dR1min, dRminB.at(i)) <= dRcut || max(dR2min, dRminB.at(i)) <= dRcut;
-      
-      h_TopQuarkPt_isGenuineTop -> Fill(isGenuine, bHt_TQuark_p4.pt());
-      if (isGenuine)
-	{
-	  if(0) std::cout << "=== bag51" << std::endl;
-	  math::XYZTLorentzVector ldgJet_p4;
-	  math::XYZTLorentzVector subldgJet_p4;
-	  math::XYZTLorentzVector Tbjet_p4, dijet_p4, trijet_p4;
-	  if(0) std::cout << "=== bag511" << std::endl;
-	  ldgJet_p4    = mcMatchedT_LdgJet;
-	  if(0) std::cout << "=== bag512" << std::endl;
-	  subldgJet_p4 = mcMatchedT_SubldgJet;
-	  if(0) std::cout << "=== bag513" << std::endl;
-	  Tbjet_p4 = mcMatchedT_BJet;
-	  if(0) std::cout << "=== bag58" << std::endl;
-	  dijet_p4  = ldgJet_p4 + subldgJet_p4;
-	  trijet_p4 = ldgJet_p4 + subldgJet_p4 + Tbjet_p4;
-	  if(0) std::cout << "=== bag52" << std::endl;
-	  double dR_j1j2 = ROOT::Math::VectorUtil::DeltaR(ldgJet_p4, subldgJet_p4);
-	  double dR_j1b  = ROOT::Math::VectorUtil::DeltaR(ldgJet_p4, Tbjet_p4);
-	  double dR_j2b  = ROOT::Math::VectorUtil::DeltaR(subldgJet_p4, Tbjet_p4);
-	  
-	  // bool mergedDijet            = dR_j1j2 < 0.8 && dR_j1b > 0.8 && dR_j2b > 0.8 && max(ldgJet.bjetDiscriminator(), subldgJet.bjetDiscriminator()) < 0.5426;
-      // bool mergedTrijet_untaggedW = max(dR_j1j2, max(dR_j1b, dR_j2b)) < 0.8 && max(ldgJet.bjetDiscriminator(), subldgJet.bjetDiscriminator()) < 0.5426;
-      /*
-      bool mergedDijet            = dR_j1j2 < 0.8 && dR_j1b > 0.8 && dR_j2b > 0.8;
-      bool mergedTrijet           = max(dR_j1j2, max(dR_j1b, dR_j2b)) < 0.8;
-      bool mergedJB               = dR_j1j2 > 0.8 && max(dR_j1b, dR_j2b) > 0.8 && min(dR_j1b, dR_j2b) < 0.8;
-      */
-	  double dR_dijet_bjet = ROOT::Math::VectorUtil::DeltaR(dijet_p4 , Tbjet_p4);
-	  if(0) std::cout << "=== bag53" << std::endl;
-	  h_GenuineTop_ldgJet_Pt         -> Fill(ldgJet_p4.pt());
-	  h_GenuineTop_subldgJet_Pt      -> Fill(subldgJet_p4.pt());
-	  h_GenuineTop_Bjet_Pt           -> Fill(Tbjet_p4.pt());
-	  h_GenuineTop_Dijet_dR          -> Fill(dR_j1j2);
-	  h_GenuineTop_ldgJet_Bjet_dR    -> Fill(dR_j1b);
-	  h_GenuineTop_subJet_Bjet_dR    -> Fill(dR_j2b); 
-	  h_GenuineTop_Dijet_Bjet_dR     -> Fill(dR_dijet_bjet);
-	  h_GenuineTop_Dijet_Pt          -> Fill(dijet_p4.pt());
-	  h_GenuineTop_Dijet_M           -> Fill(dijet_p4.M());
-	  h_GenuineTop_Trijet_Pt         -> Fill(trijet_p4.pt());
-	  h_GenuineTop_Trijet_M          -> Fill(trijet_p4.M());
-	}
-    }//For-loop: All top-quarks
-
-
-  //==================================================================================================================
-  //jet rec
-  if(0) std::cout << "=== bag6" << std::endl;
-  int iJet = 0;
-  if (selJets_p4.size() > 1) {
-    // For-loop: All selected jets                                                                                                          
-    for (size_t i=0; i < selJets_p4.size(); i++)
+  std::vector<math::XYZTLorentzVector> MGen_LdgJet, MGen_SubldgJet, MGen_Bjet;
+  if (doMatching) {
+    for (size_t i=0; i<GenTops.size(); i++)
       {
-        iJet++;
-	double genJ_Pt  = selJets_p4.at(i).pt();
-        double genJ_Eta = selJets_p4.at(i).eta();
-        // double genJ_Rap = mcTools.GetRapidity(selJets_p4.at(i));                                                                         
-
-	if (iJet==1)
-          {
-	    
-            h_GenJet1_Pt -> Fill( genJ_Pt  );
-            h_GenJet1_Eta-> Fill( genJ_Eta );
-	    
-          }
-        else if (iJet==2)
-          {
-	    
-            h_GenJet2_Pt -> Fill( genJ_Pt  );
-            h_GenJet2_Eta-> Fill( genJ_Eta );
-
-          }
-        else if (iJet==3)
-          {
-
-            h_GenJet3_Pt -> Fill( genJ_Pt  );
-            h_GenJet3_Eta-> Fill( genJ_Eta );
+	math::XYZTLorentzVector mcMatchedT_BJet;
+	math::XYZTLorentzVector BQuark;
+	BQuark = GenTops_BQuark.at(i).p4();
+	double dRmin   = 9999.9;
+	double dRminIn = 0.4;
+	// Do matching
+       	for(size_t i=0; i < selJets_p4.size(); i++)
+	  {
+	    double dR = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(i), BQuark);
+	    if (dR > dRminIn) continue;
+	    double dPtOverPt = std::abs((selJets_p4.at(i).pt() - BQuark.pt())/BQuark.pt());
+	    if (dPtOverPt > twoSigmaDpt) continue;
+	    dRmin = dR;
+	    dRminIn = dR;
+	    mcMatchedT_BJet = selJets_p4.at(i);  
 	  }
-        else if (iJet==4)
-          {
-
-            h_GenJet4_Pt -> Fill( genJ_Pt  );
-            h_GenJet4_Eta-> Fill( genJ_Eta );
-
-          }
-        else if (iJet==5)
-          {
-
-            h_GenJet5_Pt -> Fill( genJ_Pt  );
-            h_GenJet5_Eta-> Fill( genJ_Eta );
-
-          }
-	else if (iJet==6)
-          {
-
-            h_GenJet6_Pt -> Fill( genJ_Pt  );
-            h_GenJet6_Eta-> Fill( genJ_Eta );
-	    
-          }
-	else{}
-      } // for (size_t i=0; i < selJets_p4.size(); i++)
-  }  
-
-
-
-
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////                                    
-  // GenJets: Trijet with largest pT                                                                                                        
-  //////////////////////////////////////////////////////////////////////////////////////////////////////                                    
-  if(0) std::cout << "=== Trijet (Max Pt)" << std::endl;
-  int nTriJetCands = 0;
-  double dR_ij     = 0.0;
-  double dR_ik     = 0.0;
-  double dR_jk     = 0.0;
-  double dEta_ij   = 0.0;
-  double dEta_ik   = 0.0;
-  double dEta_jk   = 0.0;
-  double dPhi_ij   = 0.0;
-  double dPhi_ik   = 0.0;
-  double dPhi_jk   = 0.0;
-  double dRSum     = 0.0;
-  double dEtaSum   = 0.0;
-  double dPhiSum   = 0.0;
-  std::vector<double> dEta_ijk;
-  std::vector<double> dPhi_ijk;
-  std::vector<double> dR_ijk;
-
-  math::XYZTLorentzVector TriJetMaxPt_p4(0,0,0,0), SubldgTrijet_p4(0,0,0,0), j1(0,0,0,0), j2(0,0,0,0), j3(0,0,0,0);
-  vector<math::XYZTLorentzVector> LdgTrijet_JETS, SubldgTrijet_JETS;
-
-  if (selJets_p4.size() > 2)
-    {
-
-      // For-loop: All Selected Jets                                                                                                        
-      for (auto i = selJets_p4.begin(); i != selJets_p4.end()-2; ++i) {
-
-        // Initialise values                                                                                                                
-	dR_ij     = 0.0;
-	dR_ik     = 0.0;
-        dR_jk     = 0.0;
-        dEta_ij   = 0.0;
-        dEta_ik   = 0.0;
-        dEta_jk   = 0.0;
-        dPhi_ij   = 0.0;
-	dPhi_ik   = 0.0;
-        dPhi_jk   = 0.0;
-
-        // For-loop: All Selected Jets (nested)                                                                                             
-        for (auto j = i+1; j != selJets_p4.end()-1; ++j) {
-	  
-	  // For-loop: All Selected Jets (doubly-nested)                                                                                      
-          for (auto k = j+1; k != selJets_p4.end(); ++k) {
-            nTriJetCands++;
-
-            // Calculations                                                                                                                 
-            dR_ij = ROOT::Math::VectorUtil::DeltaR(*i, *j);
-            dR_ijk.push_back(dR_ij);
-            dR_ik = ROOT::Math::VectorUtil::DeltaR(*i, *k);
-            dR_ijk.push_back(dR_ik);
-            dR_jk = ROOT::Math::VectorUtil::DeltaR(*j, *k);
-            dR_ijk.push_back(dR_jk);
-
-            dEta_ij = std::abs( i->Eta() - j->Eta() );
-            dEta_ijk.push_back(dEta_ij);
-            dEta_ik = std::abs( i->Eta() - k->Eta() );
-            dEta_ijk.push_back(dEta_ik);
-            dEta_jk = std::abs( j->Eta() - k->Eta() );
-            dEta_ijk.push_back(dEta_jk);
-
-            dPhi_ij = std::abs( ROOT::Math::VectorUtil::DeltaPhi(*i, *j) );
-            dPhi_ijk.push_back(dEta_ij);
-            dPhi_ik = std::abs( ROOT::Math::VectorUtil::DeltaPhi(*i, *k) );
-            dPhi_ijk.push_back(dEta_ik);
-            dPhi_jk = std::abs( ROOT::Math::VectorUtil::DeltaPhi(*j, *k) );
-            dPhi_ijk.push_back(dEta_jk);
-
-	    math::XYZTLorentzVector p4 = *i + *j + *k;
-            Bool_t BjetInTrijet = IsBjet(*i,selectedBJets) || IsBjet(*j,selectedBJets) || IsBjet(*k,selectedBJets);
-
-	    if ( p4.Pt() > TriJetMaxPt_p4.Pt() && BjetInTrijet){
-	      SubldgTrijet_p4 = TriJetMaxPt_p4;
-              SubldgTrijet_JETS.clear();
-              SubldgTrijet_JETS.push_back(j1); SubldgTrijet_JETS.push_back(j2); SubldgTrijet_JETS.push_back(j3);
-              TriJetMaxPt_p4 = p4;
-              j1 = *i;
-              j2 = *j;
-	      j3 = *k;
-              LdgTrijet_JETS.clear();
-              LdgTrijet_JETS.push_back(*i); LdgTrijet_JETS.push_back(*j); LdgTrijet_JETS.push_back(*k);
-            }
-
-	    // Calculate                                                                                                                    
-            dRSum   += (dR_ij   + dR_ik   + dR_jk  )/3;
-            dEtaSum += (dEta_ij + dEta_ik + dEta_jk)/3;
-            dPhiSum += (dPhi_ij + dPhi_ik + dPhi_jk)/3;
-          }
-        }
+	dRminB.push_back(dRmin);
+	MGen_Bjet.push_back(mcMatchedT_BJet);
       }
-    }
+  }
 
-  // Fill Histos                                                                                                                            
-  h_MaxTriJetPt_Pt          ->Fill( TriJetMaxPt_p4.Pt()  );
-  h_MaxTriJetPt_Eta         ->Fill( TriJetMaxPt_p4.Eta() );
-  h_MaxTriJetPt_Rap         ->Fill( mcTools.GetRapidity(TriJetMaxPt_p4));
-  h_MaxTriJetPt_Mass        ->Fill( TriJetMaxPt_p4.M() );
-  h_MaxTriJetPt_dEtaMax     ->Fill( *max_element(dEta_ijk.begin(), dEta_ijk.end() ) );
-  h_MaxTriJetPt_dPhiMax     ->Fill( *max_element(dPhi_ijk.begin(), dPhi_ijk.end() ) );
-  h_MaxTriJetPt_dRMax       ->Fill( *max_element(dR_ijk.begin()  , dR_ijk.end()   ) );
-  h_MaxTriJetPt_dEtaMin     ->Fill( *min_element(dEta_ijk.begin(), dEta_ijk.end() ) );
-  h_MaxTriJetPt_dPhiMin     ->Fill( *min_element(dPhi_ijk.begin(), dPhi_ijk.end() ) );
-  h_MaxTriJetPt_dRMin       ->Fill( *min_element(dR_ijk.begin()  , dR_ijk.end()   ) );
-  h_MaxTriJetPt_dEtaAverage ->Fill( dEtaSum/nTriJetCands );
-  h_MaxTriJetPt_dPhiAverage ->Fill( dPhiSum/nTriJetCands );
-  h_MaxTriJetPt_dRAverage   ->Fill( dRSum/nTriJetCands   );
   
-  double TriJetMaxPt_bHt_TQuark_dR = ROOT::Math::VectorUtil::DeltaR(TriJetMaxPt_p4, bHt_TQuark_p4);
-  double dPtOverPt1 = std::abs((TriJetMaxPt_p4.pt() - bHt_TQuark_p4.pt())/bHt_TQuark_p4.pt());
-  if (TriJetMaxPt_bHt_TQuark_dR < 0.1 )
-    {
-      h_TriJetMaxPt_Top_M -> Fill(TriJetMaxPt_p4.M());
-    }
-  h_TriJetMaxPt_bHt_TQuark_dR -> Fill(TriJetMaxPt_bHt_TQuark_dR);
-  h_TriJetMaxPt_Over_bHt_TQuarkPt -> Fill(dPtOverPt1);
-  if (dPtOverPt1 < 0.32)
-    {
-      h_TriJetMaxPt_Top_OverCut_M ->Fill(TriJetMaxPt_p4.M());
-    }
+  //h_GenuineTop_Bjet_Pt           -> Fill(mcMatchedT_BJet.pt());
+  if (doMatching) {
+    for (size_t i=0; i<GenTops.size(); i++)
+      {
+	math::XYZTLorentzVector LdgQuark;
+	LdgQuark = GenTops_LdgQuark.at(i).p4();
+	math::XYZTLorentzVector SubldgQuark;
+	SubldgQuark = GenTops_SubldgQuark.at(i).p4();
+	math::XYZTLorentzVector BJet;
+	BJet = MGen_Bjet.at(i);
+	math::XYZTLorentzVector mcMatchedT_LdgJet, mcMatchedT_SubldgJet;
+	double dR1min, dR2min, dPtOverPt1min, dPtOverPt2min;
+	dR1min = dR2min = dPtOverPt1min = dPtOverPt2min = 99999.9;
+	
+	for(size_t i=0; i < selJets_p4.size(); i++)
+	  {
+	    // Skip the jets that are matched with bquarks
+	    double dRn = 9999.9;
+	    for (size_t k=0; k<GenTops.size(); k++)
+	      {
+		if (dRminB.at(k) < dRcut)
+		  {
+		    dRn = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(i) , BJet);
+		  }
+	      }
+	    if( dRn <= 0.8) continue;
+	    
+	    // Find dR for the two jets in top-decay dijet
+	    
+	    double dR1 = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(i), LdgQuark);
+	    double dR2 = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(i), SubldgQuark);
+	    
+	    // Require both jets to be within dR <= dRcut 
+	    // Calculate dPtOverPt for each jet in top-decay dijet   
+	    
+	    double dPtOverPt1 = std::abs((selJets_p4.at(i).pt() - LdgQuark.pt())/LdgQuark.pt());
+	    double dPtOverPt2 = std::abs((selJets_p4.at(i).pt() - SubldgQuark.pt())/SubldgQuark.pt());
+	    // Find which of the two is the correct match                                                                                 
+	    if (dR1 < dR2)
+	      {
+		// Is Jet1 closer in eta-phi AND has smaller pT difference?                                                               
+		if (dR1 < dR1min)
+		  {
+		    if (dPtOverPt1 < twoSigmaDpt)
+		      {
+			dR1min = dR1;
+			dPtOverPt1min= dPtOverPt1;
+			mcMatchedT_LdgJet = selJets_p4.at(i);
+		      }
+		  }
+		
+		// Is Jet2 closer in eta-phi AND has smaller pT difference?                                                           
+		//else if (dR2 <= dRcut && dR2 < dR2min)  at least two matched jets                                                       
+		else if (dR2 < dR2min)                  //at least two matched jets                                                       
+		  {
+		    if (dPtOverPt2 < twoSigmaDpt)
+		      {
+			dR2min  = dR2;
+			dPtOverPt2min = dPtOverPt2;
+			mcMatchedT_SubldgJet = selJets_p4.at(i);
+		      }
+		  }
+	      }
+	    else
+	      {
+		// Is Jet2 closer in eta-phi AND has smaller pT difference?                                                              
+		if (dR2 < dR2min)
+		  {
+		    if (dPtOverPt2 < twoSigmaDpt)
+		      {
+			dR2min  = dR2;
+			dPtOverPt2min = dPtOverPt2;
+			mcMatchedT_SubldgJet = selJets_p4.at(i);
+		      }
+		  }
+		
+		// Is Jet2 closer in eta-phi AND has smaller pT difference? 
+		
+		else if (dR1 < dR1min)                //at least two matched jets                                                         
+		  {
+		    if  (dPtOverPt1 < twoSigmaDpt)
+		      {
+			dR1min  = dR1;
+			dPtOverPt1min = dPtOverPt1;
+			mcMatchedT_LdgJet = selJets_p4.at(i);
+		      }
+		  }
+	      }
+	  }//for(auto Bjet: selectedBJets)
+      
+	// Check if TOP is genuine                                                                                                       
+	// if (doMatching)      
+	
+	bool isGenuine = false;
+	isGenuine = (dR1min<= dRcut && dR2min <= dRcut && dRminB.at(i) <= dRcut);
+	bool twoJMatched = isGenuine;  //at least two matched jets two top decay products (used for plots)
+	if (!twoJMatched) twoJMatched = max(dR1min, dR2min) <= dRcut || max(dR1min, dRminB.at(i)) <= dRcut || max(dR2min, dRminB.at(i)) <= dRcut;
+	bool isGenuineW = false;
+	isGenuineW = (dR1min<= dRcut && dR2min <= dRcut);
+	
+	if (isGenuineW)
+	  {
+	    math::XYZTLorentzVector WldgJet_p4;
+	    math::XYZTLorentzVector WsubldgJet_p4;
+	    math::XYZTLorentzVector Wdijet_p4;
+	    WldgJet_p4  = mcMatchedT_LdgJet;
+	    WsubldgJet_p4 = mcMatchedT_SubldgJet;
+	    Wdijet_p4 = WldgJet_p4 + WsubldgJet_p4;
+	    double dR_Wj1j2 = ROOT::Math::VectorUtil::DeltaR(WldgJet_p4, WsubldgJet_p4);
+	    h_GenuineWfromTop_Dijet_M      -> Fill(Wdijet_p4.M());
+	    h_GenuineWfromTop_ldgJet_Pt    -> Fill(WldgJet_p4.pt());
+	    h_GenuineWfromTop_subldgJet_Pt -> Fill(WsubldgJet_p4.pt());
+	    h_GenuineWfromTop_Dijet_Pt     -> Fill(Wdijet_p4.pt());
+	    h_GenuineWfromTop_Dijet_dR     -> Fill(dR_Wj1j2);
+	  }
+
+
+	h_TopQuarkPt_isGenuineTop -> Fill(isGenuine, bHt_TQuark_p4.pt());
+	if (isGenuine)
+	  {
+	    if(0) std::cout << "=== bag3" << std::endl;
+	    math::XYZTLorentzVector ldgJet_p4;
+	    math::XYZTLorentzVector subldgJet_p4;
+	    math::XYZTLorentzVector Tbjet_p4, dijet_p4, trijet_p4;
+	    if(0) std::cout << "=== bag511" << std::endl;
+	    ldgJet_p4    = mcMatchedT_LdgJet;
+	    if(0) std::cout << "=== bag512" << std::endl;
+	    subldgJet_p4 = mcMatchedT_SubldgJet;
+	    if(0) std::cout << "=== bag513" << std::endl;
+	    Tbjet_p4 = BJet;
+	    if(0) std::cout << "=== bag58" << std::endl;
+	    dijet_p4  = ldgJet_p4 + subldgJet_p4;
+	    trijet_p4 = ldgJet_p4 + subldgJet_p4 + Tbjet_p4;
+	    if(0) std::cout << "=== bag52" << std::endl;
+	    double dR_j1j2 = ROOT::Math::VectorUtil::DeltaR(ldgJet_p4, subldgJet_p4);
+	    double dR_j1b  = ROOT::Math::VectorUtil::DeltaR(ldgJet_p4, Tbjet_p4);
+	    double dR_j2b  = ROOT::Math::VectorUtil::DeltaR(subldgJet_p4, Tbjet_p4);
+	    
+	    // bool mergedDijet            = dR_j1j2 < 0.8 && dR_j1b > 0.8 && dR_j2b > 0.8 && max(ldgJet.bjetDiscriminator(), subldgJet.bjetDiscriminator()) < 0.5426;
+	    // bool mergedTrijet_untaggedW = max(dR_j1j2, max(dR_j1b, dR_j2b)) < 0.8 && max(ldgJet.bjetDiscriminator(), subldgJet.bjetDiscriminator()) < 0.5426;
+	    /*
+	      bool mergedDijet            = dR_j1j2 < 0.8 && dR_j1b > 0.8 && dR_j2b > 0.8;
+	      bool mergedTrijet           = max(dR_j1j2, max(dR_j1b, dR_j2b)) < 0.8;
+	      bool mergedJB               = dR_j1j2 > 0.8 && max(dR_j1b, dR_j2b) > 0.8 && min(dR_j1b, dR_j2b) < 0.8;
+	    */
+	    double dR_dijet_bjet = ROOT::Math::VectorUtil::DeltaR(dijet_p4 , Tbjet_p4);
+	    if(0) std::cout << "=== bag53" << std::endl;
+	    h_GenuineTop_ldgJet_Pt         -> Fill(ldgJet_p4.pt());
+	    h_GenuineTop_subldgJet_Pt      -> Fill(subldgJet_p4.pt());
+	    h_GenuineTop_Bjet_Pt           -> Fill(Tbjet_p4.pt());
+	    h_GenuineTop_Dijet_dR          -> Fill(dR_j1j2);
+	    h_GenuineTop_ldgJet_Bjet_dR    -> Fill(dR_j1b);
+	    h_GenuineTop_subJet_Bjet_dR    -> Fill(dR_j2b); 
+	    h_GenuineTop_Dijet_Bjet_dR     -> Fill(dR_dijet_bjet);
+	    h_GenuineTop_Dijet_Pt          -> Fill(dijet_p4.pt());
+	    h_GenuineTop_Dijet_M           -> Fill(dijet_p4.M());
+	    h_GenuineTop_Trijet_Pt         -> Fill(trijet_p4.pt());
+	    h_GenuineTop_Trijet_M          -> Fill(trijet_p4.M());
+	  }
+      }//For-loop: All top-quarks
+  }
   
-  
+
+
+
+
+
   return;
 }
 
@@ -1277,6 +1093,26 @@ double RecGenHToHW::GetWMt(const math::XYVector muon, const math::XYVector& met)
   return mT;
 }
 
+vector<genParticle> RecGenHToHW::GetGenParticlesRec(const vector<genParticle> genParticles, const int pdgId)
+{
+  std::vector<genParticle> particles;
+
+  // For-loop: All genParticles
+  for (auto& p: genParticles){
+    // Find last copy of a given particle
+    if (!p.isLastCopy()) continue;
+    
+    // Consider only particles
+    if (std::abs(p.pdgId()) != pdgId) continue;
+
+    // Save this particle
+    particles.push_back(p);
+  }
+  return particles;
+}
+
+
+
 const genParticle RecGenHToHW::GetLastCopy(const vector<genParticle> genParticles, const genParticle &p){
 
   int gen_pdgId = p.pdgId();
@@ -1290,6 +1126,7 @@ const genParticle RecGenHToHW::GetLastCopy(const vector<genParticle> genParticle
   }
   return p;
 }
+
 
 
 //calculation of W transverse mass second approach
@@ -1402,7 +1239,45 @@ Bool_t RecGenHToHW::IsBjet(math::XYZTLorentzVector jet, vector<GenJet> selectedB
   return false;
 }
 
+//chris
+Bool_t RecGenHToHW::IshadronicTop(const vector<genParticle> genParticles, const vector<genParticle> genP)
+{
+  vector<genParticle> d1;
+  bool ifoundW = false;
+  for (auto& p: genP){
+    for (size_t i=0; i<p.daughters().size(); i++)
+      {
+        int dau_index = p.daughters().at(i);
+        genParticle dau = genParticles[dau_index];
+	if (abs(dau.pdgId()) == 24)
+          {
+	    genParticle W = GetLastCopy(fEvent.genparticles().getGenParticles(), dau);
+            d1.push_back(W);
+            ifoundW = true;
+	  }
+      } // for (size_t i=0; i<p.daughters().size(); i++)
+    if (!ifoundW) return false;
+    bool hadrd2 = AreHadroDau(genParticles, d1);
+    if (!hadrd2) return false;
+  } //for (auto& p: genP)
+  return true;
+}
 
+
+
+Bool_t RecGenHToHW::AreHadroDau(const vector<genParticle> genParticles, const vector<genParticle>  genP)
+{
+  MCTools mcTools(fEvent);
+  for (auto& p: genP){
+    for (size_t i=0; i<p.daughters().size(); i++)
+      {
+	int dau_index = p.daughters().at(i);
+	genParticle dau = genParticles[dau_index];
+	if (mcTools.IsLepton(dau.pdgId())) return false;
+      }
+  }
+  return true;
+}
 
 
 
