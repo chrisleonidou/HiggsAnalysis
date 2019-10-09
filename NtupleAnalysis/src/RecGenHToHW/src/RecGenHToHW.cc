@@ -109,8 +109,6 @@ private:
   WrappedTH1 *hParticle_Pt;
   WrappedTH1 *h_htau1_htau2_dR;
   WrappedTH1 *h_HPus_dRCut_Pt;
-  WrappedTH1 *h_bHt_tWb_Wqq_qq_dR;
-  WrappedTH1 *h_bHt_tWb_Wqq_qq_dEta;
 
   //For Efficiency plots
   WrappedTH1Triplet *h_TopQuarkPt_isGenuineTop;
@@ -133,7 +131,12 @@ private:
   WrappedTH1 *h_GenuineTop_Dijet_M;
   WrappedTH1 *h_GenuineTop_Trijet_Pt;
   WrappedTH1 *h_GenuineTop_Trijet_M;
-
+  // second reco top
+  WrappedTH1 *h_SecApro_TQuarkCan_M;
+  WrappedTH1 *h_SecApro_WBosonCan_M;
+  WrappedTH1 *h_SecApro_TQuark_Topjet_dR;
+  WrappedTH1 *h_SecApro_TQuark_M;
+  WrappedTH1 *h_SecApro_WBoson_M;
 
 };
 
@@ -235,7 +238,7 @@ void RecGenHToHW::book(TDirectory *dir) {
   const int nBinsdEta  = 2*cfg_DeltaEtaBinSetting.bins();
   const double mindEta = cfg_DeltaEtaBinSetting.min();
   const double maxdEta = 2*cfg_DeltaEtaBinSetting.max();
-
+  
   const int nBinsdRap  = 2*cfg_DeltaEtaBinSetting.bins();
   const double mindRap = cfg_DeltaEtaBinSetting.min();
   const double maxdRap = 2*cfg_DeltaEtaBinSetting.max();
@@ -261,8 +264,6 @@ void RecGenHToHW::book(TDirectory *dir) {
   hParticle_Pt                  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "AllParticle_Pt"           , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
   h_htau1_htau2_dR              = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_htau1_htau2_dR"         , ";#DeltaR"      , nBinsdR, mindR, maxdR);
   h_HPus_dRCut_Pt               = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_HPus_dRCut_Pt"          , ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
-  h_bHt_tWb_Wqq_qq_dR           = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_bHt_tWb_Wqq_qq_dR"      , ";#DeltaR"      , nBinsdR, mindR, maxdR);
-  h_bHt_tWb_Wqq_qq_dEta         = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_bHt_tWb_Wqq_qq_dEta"    , ";#Delta#eta"   , nBinsdEta, mindEta, maxdEta);
   
   //For Efficiency plots
   h_TopQuarkPt_isGenuineTop = fHistoWrapper.makeTHTriplet<TH1F>(true, HistoLevel::kVital, myDirs, "h_TopQuarkPt_isGenuineTop",  ";p_{T} (GeV/c)", nBinsPt, minPt, maxPt);
@@ -286,7 +287,12 @@ void RecGenHToHW::book(TDirectory *dir) {
   h_GenuineTop_Dijet_Bjet_dR  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Dijet_Bjet_dR" , ";#DeltaR"      , nBinsdR, mindR, maxdR);
   h_GenuineTop_Dijet_M        = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Dijet_M"       , ";M (GeV/c^{2})", 100    , minM , 200.);
   h_GenuineTop_Trijet_M       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_GenuineTop_Trijet_M"      , ";M (GeV/c^{2})", 100    , minM , 500.);
-
+  //sec top rec
+  h_SecApro_TQuarkCan_M       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_SecApro_TQuarkCan_M"      , ";M (GeV/c^{2})", 100    , minM , 500.);
+  h_SecApro_WBosonCan_M       = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_SecApro_WBosonCan_M"      , ";M (GeV/c^{2})", 100    , minM , 200.);
+  h_SecApro_TQuark_M          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_SecApro_TQuark_M"         , ";M (GeV/c^{2})", 100    , minM , 500.);
+  h_SecApro_WBoson_M          = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_SecApro_WBoson_M"         , ";M (GeV/c^{2})", 100    , minM , 200.);
+  h_SecApro_TQuark_Topjet_dR  = fHistoWrapper.makeTH<TH1F>(HistoLevel::kVital, th1, "h_SecApro_TQuark_Topjet_dR" , ";#DeltaR"      , nBinsdR, mindR, maxdR);
   
 
   return;
@@ -891,15 +897,15 @@ void RecGenHToHW::process(Long64_t entry) {
 	double dRmin   = 9999.9;
 	double dRminIn = 0.4;
 	// Do matching
-       	for(size_t i=0; i < selJets_p4.size(); i++)
+       	for(size_t j=0; j < selJets_p4.size(); j++)
 	  {
-	    double dR = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(i), BQuark);
+	    double dR = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(j), BQuark);
 	    if (dR > dRminIn) continue;
-	    double dPtOverPt = std::abs((selJets_p4.at(i).pt() - BQuark.pt())/BQuark.pt());
+	    double dPtOverPt = std::abs((selJets_p4.at(j).pt() - BQuark.pt())/BQuark.pt());
 	    if (dPtOverPt > twoSigmaDpt) continue;
 	    dRmin = dR;
 	    dRminIn = dR;
-	    mcMatchedT_BJet = selJets_p4.at(i);  
+	    mcMatchedT_BJet = selJets_p4.at(j);  
 	  }
 	dRminB.push_back(dRmin);
 	MGen_Bjet.push_back(mcMatchedT_BJet);
@@ -921,7 +927,7 @@ void RecGenHToHW::process(Long64_t entry) {
 	double dR1min, dR2min, dPtOverPt1min, dPtOverPt2min;
 	dR1min = dR2min = dPtOverPt1min = dPtOverPt2min = 99999.9;
 	
-	for(size_t i=0; i < selJets_p4.size(); i++)
+	for(size_t j=0; j < selJets_p4.size(); j++)
 	  {
 	    // Skip the jets that are matched with bquarks
 	    double dRn = 9999.9;
@@ -929,21 +935,21 @@ void RecGenHToHW::process(Long64_t entry) {
 	      {
 		if (dRminB.at(k) < dRcut)
 		  {
-		    dRn = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(i) , BJet);
+		    dRn = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(j) , BJet);
 		  }
 	      }
 	    if( dRn <= 0.8) continue;
 	    
 	    // Find dR for the two jets in top-decay dijet
 	    
-	    double dR1 = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(i), LdgQuark);
-	    double dR2 = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(i), SubldgQuark);
+	    double dR1 = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(j), LdgQuark);
+	    double dR2 = ROOT::Math::VectorUtil::DeltaR(selJets_p4.at(j), SubldgQuark);
 	    
 	    // Require both jets to be within dR <= dRcut 
 	    // Calculate dPtOverPt for each jet in top-decay dijet   
 	    
-	    double dPtOverPt1 = std::abs((selJets_p4.at(i).pt() - LdgQuark.pt())/LdgQuark.pt());
-	    double dPtOverPt2 = std::abs((selJets_p4.at(i).pt() - SubldgQuark.pt())/SubldgQuark.pt());
+	    double dPtOverPt1 = std::abs((selJets_p4.at(j).pt() - LdgQuark.pt())/LdgQuark.pt());
+	    double dPtOverPt2 = std::abs((selJets_p4.at(j).pt() - SubldgQuark.pt())/SubldgQuark.pt());
 	    // Find which of the two is the correct match                                                                                 
 	    if (dR1 < dR2)
 	      {
@@ -954,7 +960,7 @@ void RecGenHToHW::process(Long64_t entry) {
 		      {
 			dR1min = dR1;
 			dPtOverPt1min= dPtOverPt1;
-			mcMatchedT_LdgJet = selJets_p4.at(i);
+			mcMatchedT_LdgJet = selJets_p4.at(j);
 		      }
 		  }
 		
@@ -966,7 +972,7 @@ void RecGenHToHW::process(Long64_t entry) {
 		      {
 			dR2min  = dR2;
 			dPtOverPt2min = dPtOverPt2;
-			mcMatchedT_SubldgJet = selJets_p4.at(i);
+			mcMatchedT_SubldgJet = selJets_p4.at(j);
 		      }
 		  }
 	      }
@@ -979,7 +985,7 @@ void RecGenHToHW::process(Long64_t entry) {
 		      {
 			dR2min  = dR2;
 			dPtOverPt2min = dPtOverPt2;
-			mcMatchedT_SubldgJet = selJets_p4.at(i);
+			mcMatchedT_SubldgJet = selJets_p4.at(j);
 		      }
 		  }
 		
@@ -991,7 +997,7 @@ void RecGenHToHW::process(Long64_t entry) {
 		      {
 			dR1min  = dR1;
 			dPtOverPt1min = dPtOverPt1;
-			mcMatchedT_LdgJet = selJets_p4.at(i);
+			mcMatchedT_LdgJet = selJets_p4.at(j);
 		      }
 		  }
 	      }
@@ -1070,9 +1076,63 @@ void RecGenHToHW::process(Long64_t entry) {
   }
   
   //chris
-  //new
+  //second reco top
+  const double SigmaWMass = 9.72589;
+  const double SigmaTMass = 17.9292;
+  const double SigmaWMass2 = SigmaWMass*SigmaWMass;
+  const double SigmaTMass2 = SigmaTMass*SigmaTMass;
+  const double WMass = 80.379;
+  const double TMass = 173.0;
+  std::vector<math::XYZTLorentzVector> v_WJet, v_TopJet;
+  for (size_t l=0; l<GenTops.size(); l++)
+    {
+      double X2min = 99999.9;
+      math::XYZTLorentzVector WJet_p4, TopJet_p4;
+      // find the best combination for top candidate
+      for(size_t i=0; i < selJets_p4.size(); i++)
+	{
+	  math::XYZTLorentzVector jet1 = selJets_p4.at(i);
+	  for(size_t j=0; j < selJets_p4.size(); j++)
+	    {
+	      math::XYZTLorentzVector jet2 = selJets_p4.at(j);
+	      math::XYZTLorentzVector dijetn = jet1 + jet2;
+	      double dMW  = dijetn.M() - WMass;
+	      double dMW2 = dMW*dMW;
+	      double dMW2SWM2 = dMW2/SigmaWMass2;
+	      for(size_t k=0; k < selJets_p4.size(); k++)
+		{
+		  math::XYZTLorentzVector jet3    = selJets_p4.at(k);
+		  math::XYZTLorentzVector trijetn = dijetn + jet3;
+		  double dMT  = trijetn.M() - TMass;
+		  double dMT2 = dMT*dMT;
+		  double dMT2SWM2 = dMT2/SigmaTMass2;
+		  double X2 = dMW2SWM2 + dMT2SWM2;
+		  if (X2 > X2min) continue;
+		  X2min = X2;
+		  WJet_p4   = dijetn;
+		  TopJet_p4 = trijetn; 
+		}// for(size_t k=0; k < selJets_p4.size(); k++)
+	    }// for(size_t j=0; j < selJets_p4.size(); j++)
+	}// for(size_t i=0; i < selJets_p4.size(); i++)
+      h_SecApro_TQuarkCan_M -> Fill(TopJet_p4.M());
+      h_SecApro_WBosonCan_M -> Fill(WJet_p4.M());
+      v_WJet.push_back(WJet_p4);
+      v_TopJet.push_back(TopJet_p4);
+    }//for (size_t l=0; l<GenTops.size(); l++)
 
 
+  // top candidate dR with GenTop
+  if (GenTops.size() == v_TopJet.size() && GenTops.size() == v_WJet.size())
+    {
+      for (size_t i=0; i<GenTops.size(); i++)
+	{
+	  double dRgt = ROOT::Math::VectorUtil::DeltaR(GenTops.at(i).p4(), v_TopJet.at(i));
+	  h_SecApro_TQuark_Topjet_dR -> Fill(dRgt);
+	  if (dRgt > 0.3) continue;
+	  h_SecApro_TQuark_M -> Fill(v_TopJet.at(i).M());
+	  h_SecApro_WBoson_M -> Fill(v_WJet.at(i).M());
+	}
+    }//if (GenTops.size() == v_TopJet.size())
 
 
   return;

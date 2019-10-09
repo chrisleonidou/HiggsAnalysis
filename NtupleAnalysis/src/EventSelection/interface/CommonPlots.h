@@ -20,6 +20,7 @@ public:
   enum AnalysisType {
     kSignalAnalysis,
     kHplus2tbAnalysis,
+    kHplus2HWAnalysis,
     kBTagEfficiencyAnalysis,
     kTauAnalysis,
     kTopReco,
