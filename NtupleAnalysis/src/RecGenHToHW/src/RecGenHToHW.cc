@@ -218,7 +218,7 @@ void RecGenHToHW::book(TDirectory *dir) {
   
   const int nBinsdR  = 2*cfg_DeltaRBinSetting.bins();                                                                                                                                                        const double mindR = cfg_DeltaRBinSetting.min();                                                                                                                                                           const double maxdR = cfg_DeltaRBinSetting.max();  
   
- 
+  /*
   const int nBinsEta  = 2*cfg_EtaBinSetting.bins();
   const double minEta = cfg_EtaBinSetting.min();
   const double maxEta = 2*cfg_EtaBinSetting.max();
@@ -226,12 +226,12 @@ void RecGenHToHW::book(TDirectory *dir) {
   const int nBinsRap  = cfg_EtaBinSetting.bins();
   const double minRap = cfg_EtaBinSetting.min();
   const double maxRap = cfg_EtaBinSetting.max();
-
+  */
   // const int nBinsPhi  = cfg_PhiBinSetting.bins();
   // const double minPhi = cfg_PhiBinSetting.min();
   // const double maxPhi = cfg_PhiBinSetting.max();
   const double minM = cfg_MassBinSetting.min();
-  
+  /*
   const int nBinsdEta  = 2*cfg_DeltaEtaBinSetting.bins();
   const double mindEta = cfg_DeltaEtaBinSetting.min();
   const double maxdEta = 2*cfg_DeltaEtaBinSetting.max();
@@ -243,7 +243,7 @@ void RecGenHToHW::book(TDirectory *dir) {
   const int nBinsdPhi  = cfg_DeltaPhiBinSetting.bins();
   const double mindPhi = cfg_DeltaPhiBinSetting.min();
   const double maxdPhi = 1.2*cfg_DeltaPhiBinSetting.max(); 
-
+  */
   
   
   TDirectory* th1 = fHistoWrapper.mkdir(HistoLevel::kVital, dir, "TH1");
@@ -1069,7 +1069,8 @@ void RecGenHToHW::process(Long64_t entry) {
       }//For-loop: All top-quarks
   }
   
-
+  //chris
+  //new
 
 
 
