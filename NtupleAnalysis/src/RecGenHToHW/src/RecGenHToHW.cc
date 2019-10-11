@@ -90,19 +90,20 @@ private:
   // Event Counters
   Count cAllEvents;
   Count cTrigger;
-  Count cElectronVeto;
+  //Count cElectronVeto;
   Count cMuonVeto;
   Count cTauVeto;
   Count cJetSelection;
-  Count cMETSelection;
+  //Count cMETSelection;
   // Count cTopologySelection;
   Count cSelected;
-  Count cFatTau;
+  Count cgenTop;
+  //Count cFatTau;
   // BR Counters
-  Count cInclusive;
-  Count cbHt_HPlus;
-  Count cbHt_HBoson;
-  Count cbHt_WBoson;
+  //Count cInclusive;
+  //Count cbHt_HPlus;
+  //Count cbHt_HBoson;
+  //Count cbHt_WBoson;
 
 
   // GenParticles                                                                                                                                                                                           
@@ -192,18 +193,19 @@ RecGenHToHW::RecGenHToHW(const ParameterSet& config, const TH1* skimCounters)
     cfg_DeltaRBinSetting(config.getParameter<ParameterSet>("CommonPlots.deltaRBins")),
     cAllEvents(fEventCounter.addCounter("All events")),
     cTrigger(fEventCounter.addCounter("Trigger")),
-    cElectronVeto(fEventCounter.addCounter("e-veto")),
+    //cElectronVeto(fEventCounter.addCounter("e-veto")),
     cMuonVeto(fEventCounter.addCounter("#mu-veto")),
     cTauVeto(fEventCounter.addCounter("#tau-veto")),
     cJetSelection(fEventCounter.addCounter("Jets + H_{T}")),
-    cMETSelection(fEventCounter.addCounter("MET")),
+    //cMETSelection(fEventCounter.addCounter("MET")),
     // cTopologySelection(fEventCounter.addCounter("Topology")),
     cSelected(fEventCounter.addCounter("All Selections")),
-    cFatTau(fEventCounter.addCounter("FatTau")),
-    cInclusive(fEventCounter.addSubCounter("Branching", "All events")),
-    cbHt_HPlus(fEventCounter.addSubCounter("Branching", "H+")),
-    cbHt_HBoson(fEventCounter.addSubCounter("Branching", "H+->HW, H")),
-    cbHt_WBoson(fEventCounter.addSubCounter("Branching", "H+->HW, W"))
+    cgenTop(fEventCounter.addSubCounter("Branching", "Genuine Top")) 
+    //cFatTau(fEventCounter.addCounter("FatTau")),
+    //cInclusive(fEventCounter.addSubCounter("Branching", "All events")),
+    //cbHt_HPlus(fEventCounter.addSubCounter("Branching", "H+")),
+    //cbHt_HBoson(fEventCounter.addSubCounter("Branching", "H+->HW, H")),
+    //cbHt_WBoson(fEventCounter.addSubCounter("Branching", "H+->HW, W"))
 { }
 
 void RecGenHToHW::book(TDirectory *dir) {
@@ -433,7 +435,7 @@ void RecGenHToHW::process(Long64_t entry) {
   if (0) std::cout << "=== Jet selection" << std::endl;
   const JetSelection::Data jetData = fJetSelection.analyze(fEvent, tauData.getSelectedTau());
   if (!jetData.passedSelection()) return;
-  
+  cJetSelection.increment();
   std::vector<math::XYZTLorentzVector> selJets_p4;                                                                                                                                                        
   math::XYZTLorentzVector jet_p4; 
   for(auto jet: jetData.getSelectedJets())
@@ -508,7 +510,7 @@ void RecGenHToHW::process(Long64_t entry) {
   if (cfg_Verbose) std::cout << "=== MET Selection" << std::endl;
   if (!cfg_METCut.passedCut(fEvent.genMET().et())) return;
   if (0) std::cout << "=== MET = " << fEvent.genMET().et() << std::endl;      
-  cMETSelection.increment();
+  //  cMETSelection.increment();
   
   
   //================================================================================================
@@ -880,7 +882,7 @@ void RecGenHToHW::process(Long64_t entry) {
   if (htau1_htau2_dR <= 0.8)
     {
       h_HPus_dRCut_Pt -> Fill(Htb_HPlus_p4.pt());
-      cFatTau.increment();
+      //cFatTau.increment();
     }
   
   bool doMatching = (GenTops_BQuark.size() == GenTops.size());
@@ -1058,6 +1060,7 @@ void RecGenHToHW::process(Long64_t entry) {
 	      bool mergedTrijet           = max(dR_j1j2, max(dR_j1b, dR_j2b)) < 0.8;
 	      bool mergedJB               = dR_j1j2 > 0.8 && max(dR_j1b, dR_j2b) > 0.8 && min(dR_j1b, dR_j2b) < 0.8;
 	    */
+	    cgenTop.increment();
 	    double dR_dijet_bjet = ROOT::Math::VectorUtil::DeltaR(dijet_p4 , Tbjet_p4);
 	    if(0) std::cout << "=== bag53" << std::endl;
 	    h_GenuineTop_ldgJet_Pt         -> Fill(ldgJet_p4.pt());
@@ -1094,6 +1097,7 @@ void RecGenHToHW::process(Long64_t entry) {
 	  math::XYZTLorentzVector jet1 = selJets_p4.at(i);
 	  for(size_t j=0; j < selJets_p4.size(); j++)
 	    {
+	      if (j == i) continue;
 	      math::XYZTLorentzVector jet2 = selJets_p4.at(j);
 	      math::XYZTLorentzVector dijetn = jet1 + jet2;
 	      double dMW  = dijetn.M() - WMass;
@@ -1101,6 +1105,7 @@ void RecGenHToHW::process(Long64_t entry) {
 	      double dMW2SWM2 = dMW2/SigmaWMass2;
 	      for(size_t k=0; k < selJets_p4.size(); k++)
 		{
+		  if(k == i || k == j) continue;
 		  math::XYZTLorentzVector jet3    = selJets_p4.at(k);
 		  math::XYZTLorentzVector trijetn = dijetn + jet3;
 		  double dMT  = trijetn.M() - TMass;

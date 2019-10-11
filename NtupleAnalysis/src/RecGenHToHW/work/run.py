@@ -151,13 +151,13 @@ def main():
     allSelections.ElectronSelection.electronPtCut  = 10.0
     allSelections.ElectronSelection.electronEtaCut = 2.1
 
-    allSelections.MuonSelection.muonPtCut  = 25.0
+    allSelections.MuonSelection.muonPtCut  = 26.0
     allSelections.MuonSelection.muonEtaCut = 2.4
     
     allSelections.TauSelection.triggerMatchingApply = False
     allSelections.TauSelection.triggerMatchingCone  =  0.1
-    allSelections.TauSelection.tauPtCut             =  30.0
-    allSelections.TauSelection.tauEtaCut            =  2.1
+    allSelections.TauSelection.tauPtCut             =  20.0
+    allSelections.TauSelection.tauEtaCut            =  2.3
     allSelections.TauSelection.tauLdgTrkPtCut       =  0.0
     allSelections.TauSelection.prongs               = -1
     allSelections.TauSelection.rtau                 =  0.0
